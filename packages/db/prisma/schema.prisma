@@ -1,0 +1,389 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── NextAuth.js Models ────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── User ──────────────────────────────────────────────────────
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+  SUPER_ADMIN
+}
+
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
+  emailVerified  DateTime?
+  password       String?
+  image          String?
+  role           Role      @default(STUDENT)
+  phone          String?
+  institution    String?
+  hscYear        String?
+  bio            String?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  enrollments   Enrollment[]
+  examAttempts  ExamAttempt[]
+  notifications Notification[]
+  payments      Payment[]
+  videoProgress VideoProgress[]
+  certificates  Certificate[]
+  materials     Material[]
+}
+
+// ─── Course System ─────────────────────────────────────────────
+
+enum CourseType {
+  FREE
+  PAID
+}
+
+model Course {
+  id             String     @id @default(cuid())
+  title          String
+  description    String?    @db.Text
+  thumbnail      String?
+  subject        String
+  type           CourseType @default(FREE)
+  price          Float?
+  instructorName String?
+  instructorBio  String?    @db.Text
+  isPublished    Boolean    @default(false)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  chapters    Chapter[]
+  enrollments Enrollment[]
+  exams       Exam[]
+  payments    Payment[]
+  certificates Certificate[]
+}
+
+model Chapter {
+  id        String   @id @default(cuid())
+  title     String
+  order     Int
+  courseId   String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  videos Video[]
+
+  @@unique([courseId, order])
+}
+
+model Video {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  videoUrl    String
+  duration    Int?     // duration in seconds
+  order       Int
+  chapterId   String
+  chapter     Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  progress VideoProgress[]
+
+  @@unique([chapterId, order])
+}
+
+model VideoProgress {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videoId        String
+  video          Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  watchedSeconds Int      @default(0)
+  completed      Boolean  @default(false)
+  updatedAt      DateTime @updatedAt
+
+  @@unique([userId, videoId])
+}
+
+// ─── Enrollment ────────────────────────────────────────────────
+
+model Enrollment {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId    String
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress    Float     @default(0)
+  completed   Boolean   @default(false)
+  enrolledAt  DateTime  @default(now())
+  completedAt DateTime?
+
+  @@unique([userId, courseId])
+}
+
+// ─── Exam System ───────────────────────────────────────────────
+
+enum ExamType {
+  MCQ
+  WRITTEN
+}
+
+model Exam {
+  id              String    @id @default(cuid())
+  title           String
+  description     String?   @db.Text
+  subject         String
+  chapter         String?
+  examType        ExamType  @default(MCQ)
+  totalMarks      Float     @default(100)
+  passPercentage  Float     @default(33)
+  timeLimit       Int       // time limit in minutes
+  negativeMarking Float?    // negative mark value (e.g. 0.25)
+  allowRetake     Boolean   @default(false)
+  instructions    String?   @db.Text
+  courseId        String?
+  course          Course?   @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  isPublished     Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  questions Question[]
+  attempts  ExamAttempt[]
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model Question {
+  id            String     @id @default(cuid())
+  examId        String
+  exam          Exam       @relation(fields: [examId], references: [id], onDelete: Cascade)
+  stem          String     @db.Text
+  optionA       String?    @db.Text
+  optionB       String?    @db.Text
+  optionC       String?    @db.Text
+  optionD       String?    @db.Text
+  correctAnswer String?
+  explanation   String?    @db.Text
+  difficulty    Difficulty @default(MEDIUM)
+  marks         Float      @default(1)
+  order         Int
+  createdAt     DateTime   @default(now())
+
+  answers MCQAnswer[]
+
+  @@unique([examId, order])
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  TIMEOUT
+}
+
+model ExamAttempt {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  examId      String
+  exam        Exam          @relation(fields: [examId], references: [id], onDelete: Cascade)
+  startTime   DateTime      @default(now())
+  endTime     DateTime?
+  expiresAt   DateTime
+  score       Float?
+  totalMarks  Float
+  correctCount Int?
+  wrongCount  Int?
+  unattempted Int?
+  status      AttemptStatus @default(IN_PROGRESS)
+  tabSwitches Int           @default(0)
+  submittedAt DateTime?
+
+  answers     MCQAnswer[]
+  writtenSubmission WrittenSubmission?
+
+  @@unique([userId, examId])
+}
+
+model MCQAnswer {
+  id             String      @id @default(cuid())
+  attemptId      String
+  attempt        ExamAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId     String
+  question       Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedAnswer String?
+  isCorrect      Boolean?
+  isFlagged      Boolean     @default(false)
+
+  @@unique([attemptId, questionId])
+}
+
+model WrittenSubmission {
+  id            String       @id @default(cuid())
+  attemptId     String       @unique
+  attempt       ExamAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  content       String?      @db.Text
+  pdfUrl        String?
+  teacherNotes  String?      @db.Text
+  awardedMarks  Float?
+  reviewedBy    String?
+  reviewedAt    DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+// ─── Question Bank (for RAG-generated questions) ──────────────
+
+model QuestionBank {
+  id            String     @id @default(cuid())
+  stem          String     @db.Text
+  optionA       String     @db.Text
+  optionB       String     @db.Text
+  optionC       String     @db.Text
+  optionD       String     @db.Text
+  correctAnswer String
+  explanation   String?    @db.Text
+  difficulty    Difficulty @default(MEDIUM)
+  subject       String
+  chapter       String?
+  source        String     @default("manual") // "manual" | "ai-generated"
+  usageCount    Int        @default(0)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+// ─── Payments ──────────────────────────────────────────────────
+
+enum PaymentMethod {
+  SSLCOMMERZ
+  BKASH
+  NAGAD
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId        String?
+  course          Course?       @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  amount          Float
+  currency        String        @default("BDT")
+  method          PaymentMethod
+  status          PaymentStatus @default(PENDING)
+  transactionId   String?       @unique
+  gatewayResponse Json?
+  invoiceUrl      String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+// ─── Notifications ─────────────────────────────────────────────
+
+enum NotifType {
+  EXAM_RESULT
+  COURSE_NEW
+  PAYMENT
+  EXAM_REMINDER
+  GENERAL
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String    @db.Text
+  type      NotifType
+  read      Boolean   @default(false)
+  link      String?
+  createdAt DateTime  @default(now())
+}
+
+// ─── Materials (for RAG/PDF uploads) ──────────────────────────
+
+model Material {
+  id        String   @id @default(cuid())
+  title     String
+  fileUrl   String
+  fileType  String
+  fileSize  Int?
+  subject   String
+  chapter   String?
+  uploadedBy String
+  user      User     @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+// ─── Certificates ──────────────────────────────────────────────
+
+model Certificate {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId          String
+  course            Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  issuedAt          DateTime @default(now())
+  pdfUrl            String?
+  certificateNumber String   @unique
+
+  @@unique([userId, courseId])
+}
