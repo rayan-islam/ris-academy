@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle, Skeleton, Badge } from '@ris-academy/ui';
-import { Users, BookOpen, FileQuestion, Banknote, TrendingUp } from 'lucide-react';
+import { Users, BookOpen, FileQuestion, Banknote, TrendingUp, ScrollText } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { formatBDT, formatDate, cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -12,6 +12,7 @@ type AdminDashboardData = {
   totalExams: number;
   totalRevenue: number;
   activeStudents: number;
+  totalCertificates: number;
   recentEnrollments: { id: string; studentName: string; courseTitle: string; enrolledAt: string }[];
   monthlyRevenue: { month: string; revenue: number }[];
   popularCourses: { id: string; title: string; enrollments: number; revenue: number }[];
@@ -23,6 +24,7 @@ const statCards = [
   { key: 'totalExams', label: 'Total Exams', icon: FileQuestion, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-950' },
   { key: 'totalRevenue', label: 'Total Revenue (BDT)', icon: Banknote, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-950' },
   { key: 'activeStudents', label: 'Active Students', icon: TrendingUp, color: 'text-rose-600', bg: 'bg-rose-50 dark:bg-rose-950' },
+  { key: 'totalCertificates', label: 'Certificates Issued', icon: ScrollText, color: 'text-cyan-600', bg: 'bg-cyan-50 dark:bg-cyan-950' },
 ] as const;
 
 export default function AdminDashboardPage() {
@@ -62,7 +64,7 @@ export default function AdminDashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
         {statCards.map(({ key, label, icon: Icon, color, bg }) => (
           <Card key={key}>
             <CardContent className="flex items-center gap-4 p-6">
@@ -98,16 +100,23 @@ export default function AdminDashboardPage() {
               <Skeleton className="h-48 w-full" />
             ) : data?.monthlyRevenue ? (
               <div className="flex items-end justify-between gap-2 h-48 px-2">
-                {data.monthlyRevenue.map((item) => (
-                  <div key={item.month} className="flex flex-col items-center gap-1 flex-1">
-                    <span className="text-xs font-medium tabular-nums">{formatBDT(item.revenue)}</span>
-                    <div
-                      className="w-full rounded-t bg-primary/80 transition-all"
-                      style={{ height: `${(item.revenue / maxRevenue) * 140}px` }}
-                    />
-                    <span className="text-xs text-muted-foreground">{item.month}</span>
-                  </div>
-                ))}
+                {data.monthlyRevenue.map((item) => {
+                  const ratio = item.revenue / maxRevenue;
+                  const intensity = Math.round(ratio * 100);
+                  return (
+                    <div key={item.month} className="flex flex-col items-center gap-1 flex-1">
+                      <span className="text-xs font-medium tabular-nums">{formatBDT(item.revenue)}</span>
+                      <div
+                        className="w-full rounded-t transition-all"
+                        style={{
+                          height: `${ratio * 140}px`,
+                          backgroundColor: `hsl(${Math.round(ratio * 200 + 200)}, 70%, ${Math.max(20, 60 - ratio * 30)}%)`,
+                        }}
+                      />
+                      <span className="text-xs text-muted-foreground">{item.month}</span>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <p className="py-12 text-center text-sm text-muted-foreground">No revenue data available</p>

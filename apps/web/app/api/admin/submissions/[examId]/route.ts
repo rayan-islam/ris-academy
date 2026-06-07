@@ -60,3 +60,75 @@ export async function GET(
     return apiError('Failed to fetch submissions', 500);
   }
 }
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { examId: string } },
+) {
+  try {
+    const admin = await requireAdmin();
+
+    const attemptId = params.examId;
+
+    const body = await req.json();
+    const { awardedMarks, teacherNotes } = body as {
+      awardedMarks: number;
+      teacherNotes?: string;
+    };
+
+    if (awardedMarks === undefined || typeof awardedMarks !== 'number') {
+      return apiError('awardedMarks is required', 400);
+    }
+
+    const existing = await db.writtenSubmission.findUnique({
+      where: { attemptId },
+      include: {
+        attempt: {
+          include: {
+            exam: true,
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (!existing) {
+      return apiError('Submission not found', 404);
+    }
+
+    const awardedScore = awardedMarks;
+
+    await db.writtenSubmission.update({
+      where: { attemptId },
+      data: {
+        awardedMarks: awardedScore,
+        teacherNotes: teacherNotes || null,
+        reviewedBy: admin.id,
+        reviewedAt: new Date(),
+      },
+    });
+
+    await db.examAttempt.update({
+      where: { id: attemptId },
+      data: {
+        score: awardedScore,
+      },
+    });
+
+    await db.notification.create({
+      data: {
+        userId: existing.attempt.userId,
+        title: 'Exam Graded',
+        message: `Your exam "${existing.attempt.exam.title}" has been graded. You scored ${awardedScore}/${existing.attempt.exam.totalMarks}.`,
+        type: 'EXAM_RESULT',
+        link: `/exams/${existing.attempt.examId}/result`,
+      },
+    });
+
+    return apiSuccess({ message: 'Grades saved' });
+  } catch (error) {
+    if (error instanceof AuthError) return apiError(error.message, error.status);
+    console.error('Grade submission error:', error);
+    return apiError('Failed to save grades', 500);
+  }
+}

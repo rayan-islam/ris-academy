@@ -15,11 +15,12 @@ import {
   Award,
   ArrowLeft,
   Trophy,
+  FileText,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { cn, formatDuration } from '@/lib/utils';
+import { cn, formatDuration, formatDate } from '@/lib/utils';
 import { toast } from 'sonner';
 
 type AnswerItem = {
@@ -39,6 +40,15 @@ type AnswerItem = {
   isFlagged: boolean;
 };
 
+type WrittenAnswerItem = {
+  questionId: string;
+  stem: string;
+  questionType: string;
+  marks: number;
+  submittedContent: string;
+  pdfUrl: string | null;
+};
+
 type ResultData = {
   attempt: {
     id: string;
@@ -56,14 +66,22 @@ type ResultData = {
     id: string;
     title: string;
     subject: string;
+    examType: string;
     totalMarks: number;
     passPercentage: number;
     negativeMarking: number | null;
   };
-  answers: AnswerItem[];
+  answers: AnswerItem[] | WrittenAnswerItem[];
   rank: number;
   totalParticipants: number;
-  passed: boolean;
+  passed: boolean | null;
+  isWritten: boolean;
+  graded: boolean;
+  writtenSubmission: {
+    awardedMarks: number | null;
+    teacherNotes: string | null;
+    reviewedAt: string | null;
+  } | null;
 };
 
 type ResultResponse = {
@@ -158,7 +176,160 @@ export default function ExamResultPage() {
 
   if (!result) return null;
 
-  const { attempt, exam, answers, rank, totalParticipants, passed } = result;
+  const { attempt, exam, answers, rank, totalParticipants, passed, isWritten, graded, writtenSubmission } = result;
+
+  if (isWritten && !graded) {
+    return (
+      <div className="mx-auto max-w-4xl space-y-8">
+        <Link
+          href="/exams"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Exams
+        </Link>
+
+        <h1 className="text-2xl font-bold">{exam.title} - Results</h1>
+
+        <Card>
+          <CardContent className="flex flex-col items-center p-12 text-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-950 mb-4">
+              <CheckCircle2 className="h-10 w-10 text-green-600" />
+            </div>
+            <h2 className="text-xl font-semibold">Submission Received</h2>
+            <p className="mt-2 text-muted-foreground max-w-md">
+              Your answers have been submitted. Grading is in progress. You will be notified once your exam has been graded.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <Link href={`/exams/${id}`}>
+                <Button variant="outline" size="lg" asChild>
+                  <span>Back to Exam</span>
+                </Button>
+              </Link>
+              <Link href="/exams">
+                <Button size="lg" asChild>
+                  <span>All Exams</span>
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (isWritten && graded) {
+    const writtenAnswers = answers as WrittenAnswerItem[];
+
+    return (
+      <div className="mx-auto max-w-4xl space-y-8">
+        <Link
+          href="/exams"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Exams
+        </Link>
+
+        <h1 className="text-2xl font-bold">{exam.title} - Results</h1>
+
+        <Card>
+          <CardContent className="flex flex-col items-center p-8">
+            <p className="text-4xl font-bold text-primary">
+              {attempt.score}/{attempt.totalMarks}
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">Awarded Marks</p>
+            <Badge
+              variant={passed === true ? 'success' : passed === false ? 'destructive' : 'secondary'}
+              className="mt-2"
+            >
+              {passed === true ? 'PASSED' : passed === false ? 'FAILED' : 'GRADED'}
+            </Badge>
+          </CardContent>
+        </Card>
+
+        {writtenSubmission?.teacherNotes && (
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-sm font-semibold mb-2">Teacher Notes</h3>
+              <p className="text-sm text-muted-foreground whitespace-pre-line">
+                {writtenSubmission.teacherNotes}
+              </p>
+              {writtenSubmission.reviewedAt && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Reviewed on {formatDate(writtenSubmission.reviewedAt)}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        <div>
+          <h2 className="mb-4 text-xl font-semibold">Your Submitted Answers</h2>
+          <div className="space-y-4">
+            {writtenAnswers.map((item, i) => (
+              <Card key={item.questionId}>
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-muted-foreground">
+                      Q{i + 1}
+                    </span>
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
+                      {item.marks} {item.marks === 1 ? 'mark' : 'marks'}
+                    </span>
+                    {item.questionType === 'FILE_UPLOAD' && (
+                      <span className="rounded-full bg-blue-100 dark:bg-blue-950 px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-400">
+                        File Upload
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-base leading-relaxed font-medium">{item.stem}</p>
+
+                  {item.submittedContent && (
+                    <div className="rounded-lg border bg-muted/50 p-4">
+                      <p className="text-xs font-semibold text-muted-foreground mb-1">
+                        Your Answer
+                      </p>
+                      <p className="text-sm whitespace-pre-line">{item.submittedContent}</p>
+                    </div>
+                  )}
+
+                  {item.pdfUrl && (
+                    <div className="flex items-center gap-2 rounded-md border bg-muted/50 px-3 py-2">
+                      <FileText className="h-4 w-4 text-blue-500" />
+                      <a
+                        href={item.pdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:underline"
+                      >
+                        View uploaded file
+                      </a>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-center pb-8">
+          <Link href="/exams">
+            <Button size="lg" variant="outline" asChild>
+              <span>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Exams
+              </span>
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // MCQ exam result (existing logic)
+  const mcqAnswers = answers as AnswerItem[];
   const percentage =
     attempt.totalMarks > 0
       ? Math.round((attempt.score / attempt.totalMarks) * 100)
@@ -167,7 +338,7 @@ export default function ExamResultPage() {
   const radius = 64;
   const circumference = 2 * Math.PI * radius;
   const dashOffset = circumference - (percentage / 100) * circumference;
-  const isPassed = passed;
+  const isPassed = passed === true;
 
   const timeTakenSeconds =
     attempt.startTime && attempt.endTime
@@ -304,7 +475,7 @@ export default function ExamResultPage() {
       <div>
         <h2 className="mb-4 text-xl font-semibold">Answer Review</h2>
         <div className="space-y-4">
-          {answers.map((item, i) => {
+          {mcqAnswers.map((item, i) => {
             const isCorrect = item.isCorrect === true;
             const isWrong = item.isCorrect === false;
             const isUnattempted = item.selectedAnswer === null;

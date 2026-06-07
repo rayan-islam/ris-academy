@@ -1,6 +1,8 @@
 import { NextRequest } from 'next/server';
 import { db } from '@ris-academy/db';
 import { apiSuccess, apiError, requireAuth, AuthError } from '@/lib/api-utils';
+import { generateCertificateHTML, generateCertificateNumber, saveCertificate } from '@/lib/certificates';
+import { formatDate } from '@/lib/utils';
 
 export async function POST(
   req: NextRequest,
@@ -79,6 +81,9 @@ export async function POST(
         },
       });
 
+      let courseProgress = 0;
+      let courseCompleted = false;
+
       if (course) {
         const allVideoIds = course.chapters.flatMap((ch) =>
           ch.videos.map((v) => v.id),
@@ -96,7 +101,14 @@ export async function POST(
         const totalProgress =
           totalVideos > 0 ? (totalCompleted / totalVideos) * 100 : 0;
 
-        await db.enrollment.upsert({
+        courseProgress = totalProgress;
+
+        await db.course.update({
+          where: { id: course.id },
+          data: { totalVideos },
+        });
+
+        const enrollment = await db.enrollment.upsert({
           where: {
             userId_courseId: { userId: user.id, courseId: chapter.courseId },
           },
@@ -107,18 +119,69 @@ export async function POST(
             progress: totalProgress,
           },
         });
-      }
-    }
 
-    return apiSuccess({
-      videoProgress: {
-        id: videoProgress.id,
-        videoId: videoProgress.videoId,
-        watchedSeconds: videoProgress.watchedSeconds,
-        completed: videoProgress.completed,
-        updatedAt: videoProgress.updatedAt,
-      },
-    });
+        if (totalProgress >= 100 && !enrollment.completed) {
+          await db.enrollment.update({
+            where: { id: enrollment.id },
+            data: { completed: true, completedAt: new Date() },
+          });
+
+          courseCompleted = true;
+
+          const certificateNumber = generateCertificateNumber();
+          const completionDate = formatDate(new Date());
+          const certificateHtml = generateCertificateHTML({
+            studentName: user.name || 'Student',
+            courseName: course.title,
+            completionDate,
+            certificateNumber,
+          });
+          const certificateUrl = await saveCertificate(certificateHtml, certificateNumber);
+
+          await db.certificate.create({
+            data: {
+              userId: user.id,
+              courseId: course.id,
+              certificateNumber,
+              pdfUrl: certificateUrl,
+            },
+          });
+
+          await db.notification.createMany({
+            data: [
+              {
+                userId: user.id,
+                title: 'Course Completed!',
+                message: `Congratulations! You have successfully completed "${course.title}".`,
+                type: 'EXAM_RESULT',
+                link: `/certificates`,
+              },
+              {
+                userId: user.id,
+                title: 'Certificate Earned',
+                message: `You've earned a certificate for completing "${course.title}"! View it in your certificates.`,
+                type: 'GENERAL',
+                link: certificateUrl,
+              },
+            ],
+          });
+        }
+      }
+
+      return apiSuccess({
+        videoProgress: {
+          id: videoProgress.id,
+          videoId: videoProgress.videoId,
+          watchedSeconds: videoProgress.watchedSeconds,
+          completed: videoProgress.completed,
+          updatedAt: videoProgress.updatedAt,
+        },
+        courseProgress: {
+          percentage: Math.round(courseProgress * 100) / 100,
+          courseCompleted,
+        },
+      });
+    }
   } catch (error) {
     if (error instanceof AuthError) return apiError(error.message, error.status);
     console.error('Video progress error:', error);

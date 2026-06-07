@@ -6,6 +6,7 @@ import {
   Skeleton,
   Badge,
   Progress,
+  Button,
 } from '@ris-academy/ui';
 import { useSession } from 'next-auth/react';
 import {
@@ -15,6 +16,7 @@ import {
   TrendingUp,
   Clock,
   ArrowRight,
+  ScrollText,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -51,6 +53,10 @@ type DashboardResponse = {
     completed: boolean;
     enrolledAt: Date;
   }[];
+  certificatesEarned: number;
+  totalStudyTime: number;
+  studyStreak: number;
+  weeklyActivity: { day: string; date: string; minutes: number }[];
 };
 
 const statConfig = [
@@ -58,6 +64,8 @@ const statConfig = [
   { key: 'completedCourses', label: 'Completed Courses', icon: Award, bg: 'bg-green-50 dark:bg-green-950', text: 'text-green-600 dark:text-green-400' },
   { key: 'upcomingExams', label: 'Upcoming Exams', icon: FileQuestion, bg: 'bg-amber-50 dark:bg-amber-950', text: 'text-amber-600 dark:text-amber-400' },
   { key: 'averageScore', label: 'Avg. Score', icon: TrendingUp, bg: 'bg-purple-50 dark:bg-purple-950', text: 'text-purple-600 dark:text-purple-400', suffix: '%' },
+  { key: 'totalStudyTime', label: 'Study Time', icon: Clock, bg: 'bg-cyan-50 dark:bg-cyan-950', text: 'text-cyan-600 dark:text-cyan-400' },
+  { key: 'certificatesEarned', label: 'Certificates', icon: ScrollText, bg: 'bg-rose-50 dark:bg-rose-950', text: 'text-rose-600 dark:text-rose-400' },
 ] as const;
 
 const activityIcons: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -110,6 +118,13 @@ export default function DashboardPage() {
     completedCourses: String(data?.completedCourses ?? 0),
     upcomingExams: String(data?.upcomingExams?.length ?? 0),
     averageScore: `${Math.round(data?.averageScore ?? 0)}%`,
+    totalStudyTime:
+      data?.totalStudyTime
+        ? data.totalStudyTime >= 60
+          ? `${Math.floor(data.totalStudyTime / 60)}h ${data.totalStudyTime % 60}m`
+          : `${data.totalStudyTime}m`
+        : '0m',
+    certificatesEarned: String(data?.certificatesEarned ?? 0),
   };
 
   return (
@@ -133,7 +148,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
         {statConfig.map(({ key, label, icon: Icon, bg, text }, i) => (
           <Card key={key}>
             <CardContent className="flex items-center gap-4 p-6">
@@ -372,6 +387,75 @@ export default function DashboardPage() {
           </Card>
         )}
       </section>
+
+      <section>
+        <h2 className="mb-4 text-xl font-semibold">Study Activity</h2>
+
+        {loading ? (
+          <Card>
+            <CardContent className="p-6">
+              <Skeleton className="h-32 w-full" />
+            </CardContent>
+          </Card>
+        ) : data?.weeklyActivity && data.weeklyActivity.length > 0 ? (
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-end justify-between gap-2" style={{ height: '128px' }}>
+                {data.weeklyActivity.map((item) => {
+                  const maxMinutes = Math.max(...data.weeklyActivity.map((w) => w.minutes), 1);
+                  const heightPercent = (item.minutes / maxMinutes) * 100;
+                  const hasActivity = item.minutes > 0;
+                  return (
+                    <div key={item.date} className="flex flex-col items-center gap-1 flex-1">
+                      <span className="text-xs font-medium tabular-nums text-muted-foreground">
+                        {item.minutes}m
+                      </span>
+                      <div
+                        className={cn(
+                          'w-full max-w-[32px] rounded-t transition-all',
+                          hasActivity
+                            ? 'bg-[#185FA5]'
+                            : 'bg-muted',
+                        )}
+                        style={{ height: `${Math.max(heightPercent, hasActivity ? 8 : 4)}px` }}
+                      />
+                      <span className="text-xs text-muted-foreground">{item.day}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              {data.studyStreak > 0 && (
+                <p className="mt-4 text-center text-sm text-muted-foreground">
+                  <span className="font-medium text-[#185FA5]">{data.studyStreak}-day</span> study streak this week
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardContent className="flex flex-col items-center py-8 text-center">
+              <Clock className="mb-4 h-12 w-12 text-muted-foreground" />
+              <p className="text-lg font-medium">No activity yet</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Start watching course videos to track your study activity.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </section>
+
+      {data && data.certificatesEarned > 0 && (
+        <section>
+          <Link
+            href="/certificates"
+            className="inline-flex items-center gap-2 rounded-lg bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700 transition-colors hover:bg-amber-100 dark:bg-amber-950 dark:text-amber-400 dark:hover:bg-amber-900"
+          >
+            <Award className="h-5 w-5" />
+            View My Certificates ({data.certificatesEarned})
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </section>
+      )}
     </div>
   );
 }

@@ -33,18 +33,30 @@ export async function POST(
     const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
 
     if (expired) {
-      await db.examAttempt.update({
-        where: { id: attempt.id },
-        data: {
-          status: 'TIMEOUT',
-          score: 0,
-          correctCount: 0,
-          wrongCount: 0,
-          unattempted: attempt.exam.questions.length,
-          submittedAt: now,
-          endTime: now,
-        },
-      });
+      if (attempt.exam.examType === 'WRITTEN') {
+        await db.examAttempt.update({
+          where: { id: attempt.id },
+          data: {
+            status: 'TIMEOUT',
+            score: 0,
+            submittedAt: now,
+            endTime: now,
+          },
+        });
+      } else {
+        await db.examAttempt.update({
+          where: { id: attempt.id },
+          data: {
+            status: 'TIMEOUT',
+            score: 0,
+            correctCount: 0,
+            wrongCount: 0,
+            unattempted: attempt.exam.questions.length,
+            submittedAt: now,
+            endTime: now,
+          },
+        });
+      }
 
       return apiSuccess({
         remainingSeconds: 0,

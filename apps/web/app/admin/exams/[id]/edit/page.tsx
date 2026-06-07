@@ -77,6 +77,7 @@ type QuestionItem = {
   correctAnswer: string;
   explanation: string | null;
   difficulty: string | null;
+  questionType: string;
   marks: number;
   order: number;
 };
@@ -123,6 +124,7 @@ export default function EditExamPage() {
   const [newCorrect, setNewCorrect] = useState('A');
   const [newExplanation, setNewExplanation] = useState('');
   const [newDifficulty, setNewDifficulty] = useState('MEDIUM');
+  const [newQuestionType, setNewQuestionType] = useState('MCQ_OPTION');
   const [newMarks, setNewMarks] = useState(1);
   const [newOrder, setNewOrder] = useState(0);
 
@@ -229,16 +231,19 @@ export default function EditExamPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          stem: newStem,
-          optionA: newOptionA,
-          optionB: newOptionB,
-          optionC: newOptionC,
-          optionD: newOptionD,
-          correctAnswer: newCorrect,
-          explanation: newExplanation || undefined,
-          difficulty: newDifficulty || 'MEDIUM',
-          marks: newMarks,
-          order: newOrder,
+          questions: [{
+            stem: newStem,
+            optionA: newQuestionType === 'MCQ_OPTION' ? newOptionA : undefined,
+            optionB: newQuestionType === 'MCQ_OPTION' ? newOptionB : undefined,
+            optionC: newQuestionType === 'MCQ_OPTION' ? newOptionC : undefined,
+            optionD: newQuestionType === 'MCQ_OPTION' ? newOptionD : undefined,
+            correctAnswer: newQuestionType === 'MCQ_OPTION' ? newCorrect : undefined,
+            explanation: newExplanation || undefined,
+            difficulty: newDifficulty || 'MEDIUM',
+            questionType: newQuestionType,
+            marks: newMarks,
+            order: newOrder,
+          }]
         }),
       });
       if (!res.ok) throw new Error('Failed to add question');
@@ -262,13 +267,14 @@ export default function EditExamPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           stem: newStem,
-          optionA: newOptionA,
-          optionB: newOptionB,
-          optionC: newOptionC,
-          optionD: newOptionD,
-          correctAnswer: newCorrect,
+          optionA: newQuestionType === 'MCQ_OPTION' ? newOptionA : undefined,
+          optionB: newQuestionType === 'MCQ_OPTION' ? newOptionB : undefined,
+          optionC: newQuestionType === 'MCQ_OPTION' ? newOptionC : undefined,
+          optionD: newQuestionType === 'MCQ_OPTION' ? newOptionD : undefined,
+          correctAnswer: newQuestionType === 'MCQ_OPTION' ? newCorrect : undefined,
           explanation: newExplanation || undefined,
           difficulty: newDifficulty || 'MEDIUM',
+          questionType: newQuestionType,
           marks: newMarks,
           order: newOrder,
         }),
@@ -321,6 +327,7 @@ export default function EditExamPage() {
     setNewCorrect(q.correctAnswer);
     setNewExplanation(q.explanation || '');
     setNewDifficulty(q.difficulty || 'MEDIUM');
+    setNewQuestionType((q as any).questionType || 'MCQ_OPTION');
     setNewMarks(q.marks);
     setNewOrder(q.order);
     setQuestionDialogOpen(true);
@@ -342,6 +349,7 @@ export default function EditExamPage() {
     setNewCorrect('A');
     setNewExplanation('');
     setNewDifficulty('MEDIUM');
+    setNewQuestionType('MCQ_OPTION');
     setNewMarks(1);
     setNewOrder(0);
   };
@@ -612,9 +620,17 @@ export default function EditExamPage() {
                               {q.difficulty}
                             </Badge>
                           )}
-                          <span className="text-xs text-muted-foreground">
-                            Answer: {q.correctAnswer}
-                          </span>
+                          {(q.questionType && q.questionType === 'FILE_UPLOAD') && (
+                            <Badge variant="outline" className="text-[10px]">File Upload</Badge>
+                          )}
+                          {(q.questionType && q.questionType === 'TEXT') && (
+                            <Badge variant="outline" className="text-[10px]">Text</Badge>
+                          )}
+                          {(!q.questionType || q.questionType === 'MCQ_OPTION') && (
+                            <span className="text-xs text-muted-foreground">
+                              Answer: {q.correctAnswer}
+                            </span>
+                          )}
                           <span className="text-xs text-muted-foreground">
                             Marks: {q.marks}
                           </span>
@@ -732,31 +748,51 @@ export default function EditExamPage() {
               />
             </div>
 
-            {['A', 'B', 'C', 'D'].map((opt) => {
-              const val = opt === 'A' ? newOptionA : opt === 'B' ? newOptionB : opt === 'C' ? newOptionC : newOptionD;
-              const setVal = opt === 'A' ? setNewOptionA : opt === 'B' ? setNewOptionB : opt === 'C' ? setNewOptionC : setNewOptionD;
-              return (
-                <div key={opt} className="space-y-2">
-                  <Label>Option {opt}</Label>
-                  <Input value={val} onChange={(e) => setVal(e.target.value)} placeholder={`Option ${opt}`} />
-                </div>
-              );
-            })}
+            <div className="space-y-2">
+              <Label>Question Type</Label>
+              <Select value={newQuestionType} onValueChange={setNewQuestionType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="MCQ_OPTION">MCQ Option</SelectItem>
+                  <SelectItem value="TEXT">Text</SelectItem>
+                  <SelectItem value="FILE_UPLOAD">File Upload</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {newQuestionType === 'MCQ_OPTION' && (
+              <>
+                {['A', 'B', 'C', 'D'].map((opt) => {
+                  const val = opt === 'A' ? newOptionA : opt === 'B' ? newOptionB : opt === 'C' ? newOptionC : newOptionD;
+                  const setVal = opt === 'A' ? setNewOptionA : opt === 'B' ? setNewOptionB : opt === 'C' ? setNewOptionC : setNewOptionD;
+                  return (
+                    <div key={opt} className="space-y-2">
+                      <Label>Option {opt}</Label>
+                      <Input value={val} onChange={(e) => setVal(e.target.value)} placeholder={`Option ${opt}`} />
+                    </div>
+                  );
+                })}
+              </>
+            )}
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Correct Answer</Label>
-                <Select value={newCorrect} onValueChange={setNewCorrect}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {['A', 'B', 'C', 'D'].map((opt) => (
-                      <SelectItem key={opt} value={opt}>Option {opt}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {newQuestionType === 'MCQ_OPTION' && (
+                <div className="space-y-2">
+                  <Label>Correct Answer</Label>
+                  <Select value={newCorrect} onValueChange={setNewCorrect}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {['A', 'B', 'C', 'D'].map((opt) => (
+                        <SelectItem key={opt} value={opt}>Option {opt}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label>Difficulty</Label>

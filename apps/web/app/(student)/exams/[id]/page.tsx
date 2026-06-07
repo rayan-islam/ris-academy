@@ -131,7 +131,12 @@ export default function ExamDetailPage() {
       }
 
       setStartDialogOpen(false);
-      window.location.href = `/exams/${id}/take`;
+
+      if (exam?.examType === 'WRITTEN') {
+        window.location.href = `/exams/${id}/write`;
+      } else {
+        window.location.href = `/exams/${id}/take`;
+      }
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Something went wrong';
@@ -381,7 +386,7 @@ export default function ExamDetailPage() {
                 className="w-full"
                 onClick={() => setStartDialogOpen(true)}
               >
-                Start Exam
+                {exam.examType === 'WRITTEN' ? 'Start Written Exam' : 'Start Exam'}
               </Button>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -407,6 +412,22 @@ export default function ExamDetailPage() {
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         Once started, you cannot pause the timer
                       </p>
+                      {exam.examType === 'WRITTEN' && (
+                        <>
+                          <p className="flex items-center gap-2">
+                            <FileQuestion className="h-4 w-4 text-muted-foreground" />
+                            Type your answers or upload PDF files
+                          </p>
+                          <p className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                            Your answers are auto-saved every 45 seconds
+                          </p>
+                          <p className="flex items-center gap-2">
+                            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                            PDF uploads: max 20MB, PDF format only
+                          </p>
+                        </>
+                      )}
                     </div>
                   </AlertDialogDescription>
                 </AlertDialogHeader>

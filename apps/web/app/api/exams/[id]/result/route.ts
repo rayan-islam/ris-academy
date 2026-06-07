@@ -32,10 +32,12 @@ export async function GET(
                 correctAnswer: true,
                 explanation: true,
                 marks: true,
+                questionType: true,
               },
             },
           },
         },
+        writtenSubmission: true,
       },
     });
 
@@ -47,6 +49,8 @@ export async function GET(
       return apiError('Exam is still in progress', 400);
     }
 
+    const isWritten = attempt.exam.examType === 'WRITTEN';
+
     const allAttempts = await db.examAttempt.findMany({
       where: {
         examId: params.id,
@@ -57,6 +61,8 @@ export async function GET(
 
     const rank =
       allAttempts.findIndex((a) => a.id === attempt.id) + 1;
+
+    const graded = attempt.writtenSubmission?.awardedMarks != null;
 
     return apiSuccess({
       attempt: {
@@ -75,32 +81,68 @@ export async function GET(
         id: attempt.exam.id,
         title: attempt.exam.title,
         subject: attempt.exam.subject,
+        examType: attempt.exam.examType,
         totalMarks: attempt.exam.totalMarks,
         passPercentage: attempt.exam.passPercentage,
         negativeMarking: attempt.exam.negativeMarking,
       },
-      answers: attempt.answers.map((a) => ({
-        questionId: a.questionId,
-        stem: a.question.stem,
-        options: {
-          A: a.question.optionA,
-          B: a.question.optionB,
-          C: a.question.optionC,
-          D: a.question.optionD,
-        },
-        selectedAnswer: a.selectedAnswer,
-        correctAnswer: a.question.correctAnswer,
-        isCorrect: a.isCorrect,
-        explanation: a.question.explanation,
-        marks: a.question.marks,
-        isFlagged: a.isFlagged,
-      })),
+      answers: isWritten
+        ? attempt.exam.questions.map((q) => {
+            let submittedContent = '';
+            if (attempt.writtenSubmission?.content) {
+              try {
+                const parsed = JSON.parse(attempt.writtenSubmission.content);
+                const entry = parsed.find(
+                  (a: { questionId: string; content: string }) => a.questionId === q.id,
+                );
+                if (entry) submittedContent = entry.content || '';
+              } catch {
+                // ignore
+              }
+            }
+            return {
+              questionId: q.id,
+              stem: q.stem,
+              questionType: q.questionType,
+              marks: q.marks,
+              submittedContent,
+              pdfUrl: attempt.writtenSubmission?.pdfUrl,
+            };
+          })
+        : attempt.answers.map((a) => ({
+            questionId: a.questionId,
+            stem: a.question.stem,
+            options: {
+              A: a.question.optionA,
+              B: a.question.optionB,
+              C: a.question.optionC,
+              D: a.question.optionD,
+            },
+            selectedAnswer: a.selectedAnswer,
+            correctAnswer: a.question.correctAnswer,
+            isCorrect: a.isCorrect,
+            explanation: a.question.explanation,
+            marks: a.question.marks,
+            isFlagged: a.isFlagged,
+          })),
       rank,
       totalParticipants: allAttempts.length,
-      passed:
-        attempt.score !== null &&
-        attempt.totalMarks > 0 &&
-        (attempt.score / attempt.totalMarks) * 100 >= attempt.exam.passPercentage,
+      passed: isWritten
+        ? graded && attempt.score != null && attempt.totalMarks > 0
+            ? (attempt.score / attempt.totalMarks) * 100 >= attempt.exam.passPercentage
+            : null
+        : attempt.score !== null &&
+          attempt.totalMarks > 0 &&
+          (attempt.score / attempt.totalMarks) * 100 >= attempt.exam.passPercentage,
+      isWritten,
+      graded,
+      writtenSubmission: attempt.writtenSubmission
+        ? {
+            awardedMarks: attempt.writtenSubmission.awardedMarks,
+            teacherNotes: attempt.writtenSubmission.teacherNotes,
+            reviewedAt: attempt.writtenSubmission.reviewedAt,
+          }
+        : null,
     });
   } catch (error) {
     if (error instanceof AuthError) return apiError(error.message, error.status);

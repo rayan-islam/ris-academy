@@ -1,4 +1,4 @@
-import { PrismaClient, Role, CourseType, ExamType, Difficulty, NotifType } from '@prisma/client';
+import { PrismaClient, Role, CourseType, ExamType, Difficulty, NotifType, PaymentMethod, PaymentStatus } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -8,6 +8,7 @@ async function main() {
 
   // Clean existing data
   await prisma.mCQAnswer.deleteMany();
+  await prisma.writtenSubmission.deleteMany();
   await prisma.examAttempt.deleteMany();
   await prisma.question.deleteMany();
   await prisma.exam.deleteMany();
@@ -247,6 +248,77 @@ async function main() {
       { userId: student1.id, title: 'New Course Available', message: 'HSC Higher Math course is now available. Enroll now!', type: NotifType.COURSE_NEW, read: false },
       { userId: student2.id, title: 'Welcome to RI\'s Academy!', message: 'Start exploring courses and exams to boost your HSC preparation.', type: NotifType.GENERAL, read: true },
     ],
+  });
+
+  // Phase 2: Written Exam
+  const writtenExam = await prisma.exam.create({
+    data: {
+      title: 'Physics - Newton\'s Laws Written Test',
+      description: 'Written examination covering Newton\'s Laws of Motion. Answer all questions in detail.',
+      subject: 'Physics',
+      chapter: 'Newton\'s Laws of Motion',
+      examType: ExamType.WRITTEN,
+      totalMarks: 30,
+      passPercentage: 33,
+      timeLimit: 60,
+      allowRetake: true,
+      instructions: 'Answer all questions. Draw diagrams where necessary. You can type your answers or upload a PDF of your handwritten answer script.',
+      courseId: physics.id,
+      isPublished: true,
+    },
+  });
+
+  // Written exam questions (text type)
+  await prisma.question.createMany({
+    data: [
+      {
+        examId: writtenExam.id,
+        stem: 'State Newton\'s three laws of motion. Provide one real-life example for each law.',
+        questionType: 'TEXT',
+        marks: 10,
+        order: 1,
+        difficulty: Difficulty.EASY,
+      },
+      {
+        examId: writtenExam.id,
+        stem: 'A block of mass 5 kg is placed on a frictionless inclined plane at an angle of 30°. Calculate the acceleration of the block down the plane and the normal force acting on it.',
+        questionType: 'TEXT',
+        marks: 10,
+        order: 2,
+        difficulty: Difficulty.MEDIUM,
+      },
+      {
+        examId: writtenExam.id,
+        stem: 'Explain the concept of inertia with examples from daily life. How does mass affect inertia?',
+        questionType: 'TEXT',
+        marks: 10,
+        order: 3,
+        difficulty: Difficulty.EASY,
+      },
+    ],
+  });
+
+  // Phase 2: Sample Payment
+  await prisma.payment.create({
+    data: {
+      userId: student1.id,
+      courseId: math.id,
+      amount: 500,
+      currency: 'BDT',
+      method: PaymentMethod.SSLCOMMERZ,
+      status: PaymentStatus.COMPLETED,
+      transactionId: 'TRX-DEMO-12345',
+      createdAt: new Date(),
+    },
+  });
+
+  // Enroll student1 in paid math course
+  await prisma.enrollment.create({
+    data: {
+      userId: student1.id,
+      courseId: math.id,
+      progress: 0,
+    },
   });
 
   console.log('✅ Seed completed successfully!');

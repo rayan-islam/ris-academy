@@ -10,7 +10,7 @@ export async function PUT(
     await requireAdmin();
 
     const body = await req.json();
-    const { stem, optionA, optionB, optionC, optionD, correctAnswer, explanation, difficulty, marks, order } = body;
+    const { stem, optionA, optionB, optionC, optionD, correctAnswer, explanation, difficulty, marks, order, questionType } = body;
 
     const existing = await db.question.findUnique({ where: { id: params.id } });
     if (!existing) return apiError('Question not found', 404);
@@ -26,6 +26,7 @@ export async function PUT(
         ...(correctAnswer !== undefined && { correctAnswer }),
         ...(explanation !== undefined && { explanation }),
         ...(difficulty !== undefined && { difficulty }),
+        ...(questionType !== undefined && { questionType }),
         ...(marks !== undefined && { marks }),
         ...(order !== undefined && { order }),
       },

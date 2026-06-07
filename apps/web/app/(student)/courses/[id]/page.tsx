@@ -22,7 +22,7 @@ import {
   ChevronRight,
   DollarSign,
 } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { formatBDT, formatDuration, cn } from '@/lib/utils';
@@ -91,11 +91,13 @@ const subjectGradients: Record<string, string> = {
 export default function CourseDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
   const [course, setCourse] = useState<CourseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [enrolling, setEnrolling] = useState(false);
+  const [checkingOut, setCheckingOut] = useState(false);
 
   useEffect(() => {
     async function fetchCourse() {
@@ -120,6 +122,15 @@ export default function CourseDetailPage() {
     fetchCourse();
   }, [params.id]);
 
+  useEffect(() => {
+    const paymentStatus = searchParams.get('payment');
+    if (paymentStatus === 'failed') {
+      toast.error('Payment failed. Please try again.');
+    } else if (paymentStatus === 'cancelled') {
+      toast.info('Payment cancelled.');
+    }
+  }, [searchParams]);
+
   const handleEnroll = async () => {
     if (!session) {
       toast.error('Please sign in to enroll');
@@ -137,11 +148,6 @@ export default function CourseDetailPage() {
         throw new Error(json.error || 'Failed to enroll');
       }
 
-      if (json.data?.requiresPayment) {
-        toast.info('This is a paid course. Payment page coming soon.');
-        return;
-      }
-
       toast.success('Successfully enrolled!');
       router.push(`/courses/${params.id}/learn`);
     } catch (err) {
@@ -150,6 +156,38 @@ export default function CourseDetailPage() {
       toast.error(message);
     } finally {
       setEnrolling(false);
+    }
+  };
+
+  const handleCheckout = async () => {
+    if (!session) {
+      toast.error('Please sign in to enroll');
+      return;
+    }
+
+    setCheckingOut(true);
+    try {
+      const res = await fetch('/api/payments/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ courseId: params.id }),
+      });
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || 'Payment checkout failed');
+      }
+
+      if (json.data?.paymentUrl) {
+        window.location.href = json.data.paymentUrl;
+      } else {
+        throw new Error('No payment URL received');
+      }
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Something went wrong';
+      toast.error(message);
+      setCheckingOut(false);
     }
   };
 
@@ -400,12 +438,17 @@ export default function CourseDetailPage() {
               <DollarSign className="h-6 w-6 text-amber-500" />
               {formatBDT(course.price)}
             </div>
-            <Button size="lg" className="w-full" disabled>
-              Buy for {formatBDT(course.price)}
+            <Button
+              size="lg"
+              className="w-full"
+              onClick={handleCheckout}
+              disabled={checkingOut}
+            >
+              {checkingOut ? 'Redirecting to payment...' : `Buy for ${formatBDT(course.price)}`}
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
             <p className="text-xs text-muted-foreground">
-              Payment integration coming soon.
+              You will be redirected to our secure payment gateway.
             </p>
           </div>
         )}

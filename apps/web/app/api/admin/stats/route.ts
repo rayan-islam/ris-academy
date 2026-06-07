@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
       recentEnrollments,
       popularCourses,
       paymentByMonth,
+      totalCertificates,
     ] = await Promise.all([
       db.user.count({ where: { role: 'STUDENT' } }),
       db.course.count(),
@@ -52,6 +53,7 @@ export async function GET(req: NextRequest) {
         },
         select: { amount: true, createdAt: true },
       }),
+      db.certificate.count(),
     ]);
 
     const monthlyRevenue: Record<string, number> = {};
@@ -70,6 +72,7 @@ export async function GET(req: NextRequest) {
       totalExams,
       totalRevenue: aggregatePayment._sum.amount ?? 0,
       activeStudents,
+      totalCertificates,
       recentEnrollments: recentEnrollments.map((e) => ({
         id: e.id,
         studentName: e.user.name ?? 'Unknown',

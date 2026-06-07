@@ -99,6 +99,7 @@ model Course {
   instructorName String?
   instructorBio  String?    @db.Text
   isPublished    Boolean    @default(false)
+  totalVideos    Int        @default(0)
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
@@ -206,6 +207,12 @@ enum Difficulty {
   HARD
 }
 
+enum QuestionType {
+  MCQ_OPTION
+  TEXT
+  FILE_UPLOAD
+}
+
 model Question {
   id            String     @id @default(cuid())
   examId        String
@@ -218,6 +225,7 @@ model Question {
   correctAnswer String?
   explanation   String?    @db.Text
   difficulty    Difficulty @default(MEDIUM)
+  questionType  QuestionType @default(MCQ_OPTION)
   marks         Float      @default(1)
   order         Int
   createdAt     DateTime   @default(now())

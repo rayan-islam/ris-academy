@@ -36,6 +36,7 @@ export async function GET(
             difficulty: true,
             marks: true,
             order: true,
+            questionType: true,
           },
         },
       },

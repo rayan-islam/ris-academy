@@ -6,7 +6,18 @@ export async function GET() {
   try {
     const user = await requireAuth();
 
-    const [enrollments, upcomingExams, recentActivity, averageScoreResult] =
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const [
+      enrollments,
+      upcomingExams,
+      recentActivity,
+      averageScoreResult,
+      certificatesCount,
+      totalStudyTimeResult,
+      weeklyVideoProgress,
+    ] =
       await Promise.all([
         db.enrollment.findMany({
           where: { userId: user.id },
@@ -110,10 +121,68 @@ export async function GET() {
           },
           _avg: { score: true },
         }),
+
+        db.certificate.count({ where: { userId: user.id } }),
+
+        db.videoProgress.aggregate({
+          where: { userId: user.id },
+          _sum: { watchedSeconds: true },
+        }),
+
+        db.videoProgress.findMany({
+          where: {
+            userId: user.id,
+            updatedAt: { gte: sevenDaysAgo },
+          },
+          select: { updatedAt: true, watchedSeconds: true },
+        }),
       ]);
 
     const enrolledCoursesCount = enrollments.length;
     const completedCoursesCount = enrollments.filter((e) => e.completed).length;
+
+    const totalStudySeconds = totalStudyTimeResult._sum.watchedSeconds ?? 0;
+    const totalStudyTime = Math.round(totalStudySeconds / 60);
+
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const weeklyActivityMap: Record<string, number> = {};
+
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      weeklyActivityMap[key] = 0;
+    }
+
+    for (const vp of weeklyVideoProgress) {
+      const key = vp.updatedAt.toISOString().slice(0, 10);
+      if (key in weeklyActivityMap) {
+        const current = weeklyActivityMap[key];
+        if (current !== undefined) {
+          weeklyActivityMap[key] = current + vp.watchedSeconds;
+        }
+      }
+    }
+
+    const weeklyActivity = Object.entries(weeklyActivityMap).map(([dateKey, seconds]) => {
+      const d = new Date(dateKey + 'T00:00:00');
+      return {
+        day: dayNames[d.getDay()],
+        date: dateKey,
+        minutes: Math.round(seconds / 60),
+      };
+    });
+
+    let studyStreak = 0;
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      const val = weeklyActivityMap[key];
+      if (val !== undefined && val > 0) {
+        studyStreak++;
+      }
+    }
 
     const enrolledCoursesList = enrollments.map((e) => ({
       id: e.course.id,
@@ -139,6 +208,10 @@ export async function GET() {
         : 0,
       recentActivity,
       enrolledCoursesList,
+      certificatesEarned: certificatesCount,
+      totalStudyTime,
+      studyStreak,
+      weeklyActivity,
     });
   } catch (error) {
     if (error instanceof AuthError) return apiError(error.message, error.status);

@@ -15,9 +15,10 @@ export async function POST(
     if (!existing) return apiError('Exam not found', 404);
 
     const body = await req.json();
-    const { questions } = body;
 
-    if (!questions || !Array.isArray(questions) || questions.length === 0) {
+    const questionList = body.questions || (body.stem ? [body] : null);
+
+    if (!questionList || !Array.isArray(questionList) || questionList.length === 0) {
       return apiError('Questions array is required', 400);
     }
 
@@ -29,7 +30,7 @@ export async function POST(
     let nextOrder = (maxOrderResult?.order ?? -1) + 1;
 
     const createdQuestions = [];
-    for (const q of questions) {
+    for (const q of questionList) {
       const parsed = questionCreateSchema.safeParse({
         ...q,
         order: q.order !== undefined ? q.order : nextOrder,

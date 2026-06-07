@@ -34,9 +34,7 @@ export async function POST(
     }
 
     const body = await req.json();
-    const { answers } = body as {
-      answers: { questionId: string; selectedAnswer: string | null }[];
-    };
+    const { answers } = body;
 
     if (!Array.isArray(answers)) {
       return apiError('Invalid answers format', 400);
@@ -45,6 +43,46 @@ export async function POST(
     const now = new Date();
     const isTimeout = now > attempt.expiresAt;
     const status = isTimeout ? 'TIMEOUT' : 'COMPLETED';
+
+    if (attempt.exam.examType === 'WRITTEN') {
+      const writtenAnswers = answers as { questionId: string; content: string }[];
+
+      const answersJson = JSON.stringify(
+        writtenAnswers.map((a) => ({ questionId: a.questionId, content: a.content || '' })),
+      );
+
+      await db.writtenSubmission.upsert({
+        where: { attemptId: attempt.id },
+        create: {
+          attemptId: attempt.id,
+          content: answersJson,
+        },
+        update: {
+          content: answersJson,
+        },
+      });
+
+      await db.examAttempt.update({
+        where: { id: attempt.id },
+        data: {
+          status,
+          score: isTimeout ? 0 : null,
+          submittedAt: now,
+          endTime: now,
+        },
+      });
+
+      return apiSuccess({
+        attemptId: attempt.id,
+        status,
+        totalMarks: attempt.exam.totalMarks,
+        message: 'Submission received',
+        submissionStatus: 'PENDING_GRADING',
+      });
+    }
+
+    // MCQ exam submission (existing logic)
+    const mcqAnswers = answers as { questionId: string; selectedAnswer: string | null }[];
 
     let correctCount = 0;
     let wrongCount = 0;
@@ -55,7 +93,7 @@ export async function POST(
       attempt.exam.questions.map((q) => [q.id, q]),
     );
 
-    for (const answer of answers) {
+    for (const answer of mcqAnswers) {
       const question = questionMap.get(answer.questionId);
 
       if (!answer.selectedAnswer || answer.selectedAnswer === null) {
@@ -129,7 +167,6 @@ export async function POST(
         unattempted,
         submittedAt: now,
         endTime: now,
-        ...(isTimeout && { status: 'TIMEOUT' as const }),
       },
     });
 

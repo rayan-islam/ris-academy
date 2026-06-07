@@ -47,13 +47,14 @@ export const examCreateSchema = z.object({
 
 export const questionCreateSchema = z.object({
   stem: z.string().min(1, 'Question stem is required'),
-  optionA: z.string().min(1, 'Option A is required'),
-  optionB: z.string().min(1, 'Option B is required'),
-  optionC: z.string().min(1, 'Option C is required'),
-  optionD: z.string().min(1, 'Option D is required'),
-  correctAnswer: z.enum(['A', 'B', 'C', 'D']),
+  optionA: z.string().optional(),
+  optionB: z.string().optional(),
+  optionC: z.string().optional(),
+  optionD: z.string().optional(),
+  correctAnswer: z.string().optional(),
   explanation: z.string().optional(),
   difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']).optional(),
+  questionType: z.enum(['MCQ_OPTION', 'TEXT', 'FILE_UPLOAD']).default('MCQ_OPTION'),
   marks: z.number().min(0.5).default(1),
   order: z.number().min(0),
 });
@@ -63,6 +64,15 @@ export const examSubmissionSchema = z.object({
     z.object({
       questionId: z.string(),
       selectedAnswer: z.string().nullable(),
+    }),
+  ),
+});
+
+export const writtenSubmissionSchema = z.object({
+  answers: z.array(
+    z.object({
+      questionId: z.string(),
+      content: z.string().optional(),
     }),
   ),
 });
