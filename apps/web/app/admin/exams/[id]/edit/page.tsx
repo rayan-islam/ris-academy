@@ -70,6 +70,7 @@ type ExamDetails = {
 type QuestionItem = {
   id: string;
   stem: string;
+  imageUrl: string | null;
   optionA: string;
   optionB: string;
   optionC: string;
@@ -117,6 +118,7 @@ export default function EditExamPage() {
   const [savingQuestion, setSavingQuestion] = useState(false);
 
   const [newStem, setNewStem] = useState('');
+  const [newImageUrl, setNewImageUrl] = useState('');
   const [newOptionA, setNewOptionA] = useState('');
   const [newOptionB, setNewOptionB] = useState('');
   const [newOptionC, setNewOptionC] = useState('');
@@ -233,6 +235,7 @@ export default function EditExamPage() {
         body: JSON.stringify({
           questions: [{
             stem: newStem,
+            imageUrl: newImageUrl || undefined,
             optionA: newQuestionType === 'MCQ_OPTION' ? newOptionA : undefined,
             optionB: newQuestionType === 'MCQ_OPTION' ? newOptionB : undefined,
             optionC: newQuestionType === 'MCQ_OPTION' ? newOptionC : undefined,
@@ -267,6 +270,7 @@ export default function EditExamPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           stem: newStem,
+          imageUrl: newImageUrl || undefined,
           optionA: newQuestionType === 'MCQ_OPTION' ? newOptionA : undefined,
           optionB: newQuestionType === 'MCQ_OPTION' ? newOptionB : undefined,
           optionC: newQuestionType === 'MCQ_OPTION' ? newOptionC : undefined,
@@ -320,6 +324,7 @@ export default function EditExamPage() {
   const openEditQuestion = (q: QuestionItem) => {
     setEditingQuestion(q);
     setNewStem(q.stem);
+    setNewImageUrl(q.imageUrl || '');
     setNewOptionA(q.optionA);
     setNewOptionB(q.optionB);
     setNewOptionC(q.optionC);
@@ -342,6 +347,7 @@ export default function EditExamPage() {
 
   const resetQuestionForm = () => {
     setNewStem('');
+    setNewImageUrl('');
     setNewOptionA('');
     setNewOptionB('');
     setNewOptionC('');
@@ -746,6 +752,27 @@ export default function EditExamPage() {
                 className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 placeholder="Enter the question text"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Image URL (optional)</Label>
+              <Input
+                value={newImageUrl}
+                onChange={(e) => setNewImageUrl(e.target.value)}
+                placeholder="https://example.com/image.png"
+              />
+              {newImageUrl && (
+                <div className="mt-2 rounded-lg border overflow-hidden">
+                  <img
+                    src={newImageUrl}
+                    alt="Question preview"
+                    className="max-h-48 w-full object-contain bg-muted"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">

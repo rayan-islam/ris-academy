@@ -47,6 +47,7 @@ export const examCreateSchema = z.object({
 
 export const questionCreateSchema = z.object({
   stem: z.string().min(1, 'Question stem is required'),
+  imageUrl: z.string().url().optional().or(z.literal('')),
   optionA: z.string().optional(),
   optionB: z.string().optional(),
   optionC: z.string().optional(),

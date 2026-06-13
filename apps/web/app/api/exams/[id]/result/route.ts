@@ -25,6 +25,7 @@ export async function GET(
               select: {
                 id: true,
                 stem: true,
+                imageUrl: true,
                 optionA: true,
                 optionB: true,
                 optionC: true,
@@ -103,6 +104,7 @@ export async function GET(
             return {
               questionId: q.id,
               stem: q.stem,
+              imageUrl: q.imageUrl,
               questionType: q.questionType,
               marks: q.marks,
               submittedContent,
@@ -112,6 +114,7 @@ export async function GET(
         : attempt.answers.map((a) => ({
             questionId: a.questionId,
             stem: a.question.stem,
+            imageUrl: a.question.imageUrl,
             options: {
               A: a.question.optionA,
               B: a.question.optionB,

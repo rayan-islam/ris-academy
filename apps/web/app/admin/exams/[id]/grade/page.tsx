@@ -45,11 +45,19 @@ type AttemptItem = {
   } | null;
 };
 
+type QuestionInfo = {
+  id: string;
+  stem: string;
+  imageUrl: string | null;
+  order: number;
+};
+
 export default function GradeExamPage() {
   const params = useParams();
   const router = useRouter();
   const examId = params.id as string;
   const [attempts, setAttempts] = useState<AttemptItem[]>([]);
+  const [questions, setQuestions] = useState<QuestionInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [grading, setGrading] = useState<Record<string, boolean>>({});
@@ -64,6 +72,7 @@ export default function GradeExamPage() {
         if (examRes.ok) {
           const examJson = await examRes.json();
           setExamTitle(examJson.data?.title || '');
+          setQuestions(examJson.data?.questions || []);
         }
 
         const res = await fetch(`/api/admin/submissions/${examId}?status=COMPLETED`);
@@ -225,19 +234,41 @@ export default function GradeExamPage() {
                     <div className="mt-4 space-y-4 border-t pt-4">
                       {parsedAnswers.length > 0 ? (
                         <div className="space-y-3">
-                          {parsedAnswers.map((answer, i) => (
-                            <div
-                              key={answer.questionId}
-                              className="rounded-lg border bg-muted/50 p-4"
-                            >
-                              <p className="text-xs font-semibold text-muted-foreground mb-2">
-                                Answer {i + 1}
-                              </p>
-                              <p className="text-sm whitespace-pre-line">
-                                {answer.content || '(No answer provided)'}
-                              </p>
-                            </div>
-                          ))}
+                          {parsedAnswers.map((answer, i) => {
+                            const q = questions.find((q) => q.id === answer.questionId);
+                            return (
+                              <div
+                                key={answer.questionId}
+                                className="rounded-lg border bg-muted/50 p-4"
+                              >
+                                <p className="text-xs font-semibold text-muted-foreground mb-2">
+                                  Question {i + 1}
+                                </p>
+                                {q?.stem && (
+                                  <p className="text-sm font-medium mb-2">
+                                    {q.stem}
+                                  </p>
+                                )}
+                                {q?.imageUrl && (
+                                  <div className="rounded-lg border overflow-hidden mb-2">
+                                    <img
+                                      src={q.imageUrl}
+                                      alt="Question"
+                                      className="max-h-36 w-full object-contain bg-muted"
+                                    />
+                                  </div>
+                                )}
+                                <div className="rounded bg-background p-3 mt-2">
+                                  <p className="text-xs font-semibold text-muted-foreground mb-1">
+                                    Student Answer
+                                  </p>
+                                  <p className="text-sm whitespace-pre-line">
+                                    {answer.content || '(No answer provided)'}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       ) : (
                         <p className="text-sm text-muted-foreground">

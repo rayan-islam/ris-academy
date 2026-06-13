@@ -73,6 +73,7 @@ export interface ExamCreateInput {
 
 export interface QuestionCreateInput {
   stem: string;
+  imageUrl?: string;
   optionA: string;
   optionB: string;
   optionC: string;

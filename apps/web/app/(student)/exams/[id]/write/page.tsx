@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 type Question = {
   id: string;
   stem: string;
+  imageUrl: string | null;
   questionType: 'MCQ_OPTION' | 'TEXT' | 'FILE_UPLOAD';
   marks: number;
   order: number;
@@ -431,6 +432,16 @@ export default function WrittenExamPage() {
                     )}
                   </div>
                 </div>
+
+                {q.imageUrl && (
+                  <div className="rounded-lg border overflow-hidden mb-3">
+                    <img
+                      src={q.imageUrl}
+                      alt="Question"
+                      className="max-h-48 w-full object-contain bg-muted"
+                    />
+                  </div>
+                )}
 
                 <p className="text-base leading-relaxed">{q.stem}</p>
 

@@ -29,6 +29,7 @@ export async function GET(
           select: {
             id: true,
             stem: true,
+            imageUrl: true,
             optionA: true,
             optionB: true,
             optionC: true,

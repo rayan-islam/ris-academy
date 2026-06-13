@@ -26,6 +26,7 @@ import { toast } from 'sonner';
 type AnswerItem = {
   questionId: string;
   stem: string;
+  imageUrl: string | null;
   options: {
     A: string;
     B: string;
@@ -43,6 +44,7 @@ type AnswerItem = {
 type WrittenAnswerItem = {
   questionId: string;
   stem: string;
+  imageUrl: string | null;
   questionType: string;
   marks: number;
   submittedContent: string;
@@ -284,6 +286,16 @@ export default function ExamResultPage() {
                     )}
                   </div>
 
+                  {item.imageUrl && (
+                    <div className="rounded-lg border overflow-hidden mb-3">
+                      <img
+                        src={item.imageUrl}
+                        alt="Question"
+                        className="max-h-48 w-full object-contain bg-muted"
+                      />
+                    </div>
+                  )}
+
                   <p className="text-base leading-relaxed font-medium">{item.stem}</p>
 
                   {item.submittedContent && (
@@ -512,6 +524,16 @@ export default function ExamResultPage() {
                       </Badge>
                     )}
                   </div>
+
+                  {item.imageUrl && (
+                    <div className="rounded-lg border overflow-hidden mb-3">
+                      <img
+                        src={item.imageUrl}
+                        alt="Question"
+                        className="max-h-48 w-full object-contain bg-muted"
+                      />
+                    </div>
+                  )}
 
                   <p className="text-base leading-relaxed font-medium">
                     {item.stem}

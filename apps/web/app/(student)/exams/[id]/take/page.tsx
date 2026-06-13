@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 type Question = {
   id: string;
   stem: string;
+  imageUrl: string | null;
   optionA: string;
   optionB: string;
   optionC: string;
@@ -428,6 +429,16 @@ export default function ExamTakePage() {
                       : 'Flag for Review'}
                   </button>
                 </div>
+
+                {currentQuestion.imageUrl && (
+                  <div className="rounded-lg border overflow-hidden mb-4">
+                    <img
+                      src={currentQuestion.imageUrl}
+                      alt="Question"
+                      className="max-h-64 w-full object-contain bg-muted"
+                    />
+                  </div>
+                )}
 
                 <p className="text-lg leading-relaxed">
                   {currentQuestion.stem}

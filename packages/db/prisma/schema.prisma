@@ -218,6 +218,7 @@ model Question {
   examId        String
   exam          Exam       @relation(fields: [examId], references: [id], onDelete: Cascade)
   stem          String     @db.Text
+  imageUrl      String?
   optionA       String?    @db.Text
   optionB       String?    @db.Text
   optionC       String?    @db.Text
