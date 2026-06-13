@@ -35,9 +35,10 @@ export function AdminNavbar() {
           >
             <Menu className="h-5 w-5" />
           </Button>
-          <span className="text-lg font-bold text-[#185FA5] lg:hidden">
-            RI&apos;s Academy
-          </span>
+          <div className="flex items-center gap-2.5 lg:hidden">
+            <img src="/ris_academy_emblem.svg" alt="RI's Academy" className="h-7 w-auto" />
+            <span className="text-lg font-bold text-[#185FA5]">RI&apos;s Academy</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">

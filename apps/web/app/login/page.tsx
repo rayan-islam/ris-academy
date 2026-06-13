@@ -7,7 +7,6 @@ import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { GraduationCap } from 'lucide-react';
 import { Button, Input, Label, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@ris-academy/ui';
 import { loginSchema } from '@/lib/validators';
 import { cn } from '@/lib/utils';
@@ -79,8 +78,8 @@ function LoginForm() {
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-            <GraduationCap className="h-7 w-7 text-primary" />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#185FA5]/10">
+            <img src="/ris_academy_emblem.svg" alt="RI's Academy" className="h-7 w-auto" />
           </div>
           <CardTitle className="text-2xl">Welcome back</CardTitle>
           <CardDescription>Sign in to your RI&apos;s Academy account</CardDescription>

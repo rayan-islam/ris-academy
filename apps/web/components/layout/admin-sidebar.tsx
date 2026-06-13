@@ -12,7 +12,6 @@ import {
   Bell,
   Database,
   FolderOpen,
-  GraduationCap,
   FileText,
   ChevronLeft,
 } from 'lucide-react';
@@ -70,9 +69,9 @@ export function AdminSidebar() {
 
   return (
     <aside className="hidden lg:flex flex-col fixed inset-y-0 left-0 z-30 w-64 border-r bg-white dark:bg-gray-950 pt-16">
-      <div className="flex items-center gap-2 px-6 py-4 border-b">
-        <GraduationCap className="h-6 w-6 text-[#185FA5]" />
-        <span className="text-lg font-bold text-[#185FA5]">RI&apos;s Academy Admin</span>
+      <div className="flex items-center gap-2.5 px-6 py-4 border-b">
+        <img src="/ris_academy_emblem.svg" alt="RI's Academy" className="h-7 w-auto" />
+        <span className="text-lg font-bold text-[#185FA5]">RI&apos;s Academy</span>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">

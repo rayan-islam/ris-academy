@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     template: "%s | RI's Academy",
   },
   description: 'Modern educational platform for HSC students in Bangladesh',
+  icons: [{ rel: 'icon', url: '/ris_academy_emblem.svg' }],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -25,7 +25,6 @@ import {
   Bell,
   Sun,
   Moon,
-  GraduationCap,
   BookOpen,
   FileQuestion,
   LayoutDashboard,
@@ -50,9 +49,9 @@ export function Navbar() {
   return (
     <nav className="fixed inset-x-0 top-0 z-50 h-16 border-b bg-white dark:bg-gray-950">
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 text-[#185FA5]">
-          <GraduationCap className="h-8 w-8" />
-          <span className="text-xl font-bold">RI&apos;s Academy</span>
+        <Link href="/" className="flex items-center gap-2.5">
+          <img src="/ris_academy_emblem.svg" alt="RI's Academy" className="h-8 w-auto" />
+          <span className="text-xl font-bold text-[#185FA5]">RI&apos;s Academy</span>
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">

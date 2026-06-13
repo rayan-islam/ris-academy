@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { getServerSession } from 'next-auth';
-import { BookOpen, GraduationCap, Users, BarChart3, ArrowRight } from 'lucide-react';
+import { Users, BookOpen, BarChart3, ArrowRight, GraduationCap } from 'lucide-react';
 import { Button, Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@ris-academy/ui';
-import { authOptions } from '@/lib/auth';
 import { cn } from '@/lib/utils';
+import { Navbar } from '@/components/layout/navbar';
+import { Footer } from '@/components/layout/footer';
+import { HeroCarousel } from '@/components/shared/hero-carousel';
 
 async function getFeaturedCourses() {
   try {
@@ -18,75 +19,17 @@ async function getFeaturedCourses() {
 }
 
 export default async function HomePage() {
-  const session = await getServerSession(authOptions);
   const courses = await getFeaturedCourses();
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-            <GraduationCap className="h-7 w-7" />
-            <span>RI&apos;s Academy</span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <Link href="/courses" className="text-muted-foreground hover:text-foreground transition-colors">
-              Courses
-            </Link>
-            <Link href="/exams" className="text-muted-foreground hover:text-foreground transition-colors">
-              Exams
-            </Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            {!session ? (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" size="sm">Login</Button>
-                </Link>
-                <Link href="/signup">
-                  <Button size="sm">Sign Up</Button>
-                </Link>
-              </>
-            ) : (
-              <Link href="/dashboard">
-                <Button size="sm">Dashboard</Button>
-              </Link>
-            )}
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-primary/5 to-background py-20 md:py-32">
-          <div className="container text-center max-w-4xl">
-            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              Ace Your HSC Exams with{' '}
-              <span className="text-primary">RI&apos;s Academy</span>
-            </h1>
-            <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
-              Modern online learning platform for HSC students in Bangladesh. Expert-led courses,
-              interactive exams, and comprehensive progress tracking to help you succeed.
-            </p>
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href={session ? '/courses' : '/signup'}>
-                <Button size="lg" className="w-full sm:w-auto text-base">
-                  Get Started <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="/courses">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto text-base">
-                  Browse Courses
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
+        <HeroCarousel />
 
-        {/* Stats Section */}
         <section className="py-16 bg-primary/5">
-          <div className="container">
+          <div className="container mx-auto px-4 max-w-7xl">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div>
                 <p className="text-4xl font-bold text-primary">500+</p>
@@ -108,9 +51,8 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Features Section */}
         <section className="py-20 md:py-28">
-          <div className="container">
+          <div className="container mx-auto px-4 max-w-7xl">
             <div className="text-center mb-16">
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 Everything You Need to Excel
@@ -151,10 +93,9 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Featured Courses */}
         {courses.length > 0 && (
           <section className="py-20 md:py-28 bg-muted/40">
-            <div className="container">
+            <div className="container mx-auto px-4 max-w-7xl">
               <div className="flex items-end justify-between mb-12">
                 <div>
                   <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Featured Courses</h2>
@@ -170,13 +111,17 @@ export default async function HomePage() {
                 {courses.map((course: any) => (
                   <Link key={course.id} href={`/courses/${course.id}`}>
                     <Card className="h-full hover:shadow-md transition-shadow group">
-                      {course.thumbnail && (
+                      {course.thumbnail ? (
                         <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-muted">
                           <img
                             src={course.thumbnail}
                             alt={course.title}
                             className="h-full w-full object-cover group-hover:scale-105 transition-transform"
                           />
+                        </div>
+                      ) : (
+                        <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-gradient-to-br from-[#185FA5] to-blue-700 flex items-center justify-center">
+                          <GraduationCap className="h-12 w-12 text-white/60" />
                         </div>
                       )}
                       <CardHeader>
@@ -222,26 +167,7 @@ export default async function HomePage() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t py-12 md:py-16">
-        <div className="container">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2 font-bold text-lg">
-              <GraduationCap className="h-6 w-6 text-primary" />
-              <span>RI&apos;s Academy</span>
-            </div>
-            <nav className="flex items-center gap-6 text-sm text-muted-foreground">
-              <Link href="/courses" className="hover:text-foreground transition-colors">Courses</Link>
-              <Link href="/exams" className="hover:text-foreground transition-colors">Exams</Link>
-              <Link href="/login" className="hover:text-foreground transition-colors">Login</Link>
-              <Link href="/signup" className="hover:text-foreground transition-colors">Sign Up</Link>
-            </nav>
-            <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} RI&apos;s Academy. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

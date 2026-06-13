@@ -58,3 +58,8 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+@keyframes star-beat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
