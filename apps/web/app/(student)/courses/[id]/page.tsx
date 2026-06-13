@@ -3,9 +3,6 @@
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
   Button,
   Badge,
   Skeleton,
@@ -21,6 +18,7 @@ import {
   CheckCircle,
   ChevronRight,
   DollarSign,
+  Star,
 } from 'lucide-react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -87,6 +85,24 @@ const subjectGradients: Record<string, string> = {
   ICT: 'from-orange-500 to-amber-600',
   Bangla: 'from-red-500 to-rose-600',
 };
+
+function AnimatedStars() {
+  return (
+    <div className="flex items-center gap-0.5">
+      {[350, 500, 700, 900, 1100].map((duration, i) => (
+        <div
+          key={i}
+          className="relative"
+          style={{
+            animation: `star-beat ${duration}ms ease-in-out infinite`,
+          }}
+        >
+          <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function CourseDetailPage() {
   const params = useParams();
@@ -233,17 +249,18 @@ export default function CourseDetailPage() {
     <div className="space-y-8">
       <div
         className={cn(
-          'relative overflow-hidden rounded-xl bg-gradient-to-br p-8 text-white',
+          'relative overflow-hidden rounded-xl bg-gradient-to-br p-8 sm:p-12 text-white',
           subjectGradients[course.subject] || 'from-gray-500 to-gray-700',
         )}
       >
         <div className="relative z-10">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-white/20 text-white hover:bg-white/20">
+            <Badge className="bg-white/20 text-white hover:bg-white/20 text-sm px-3 py-1">
               {course.subject}
             </Badge>
             <Badge
               className={cn(
+                'text-sm px-3 py-1',
                 course.type === 'FREE'
                   ? 'bg-green-500 text-white hover:bg-green-500'
                   : 'bg-amber-500 text-white hover:bg-amber-500',
@@ -254,9 +271,13 @@ export default function CourseDetailPage() {
                 : `PAID ${formatBDT(course.price)}`}
             </Badge>
           </div>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl">
+          <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">
             {course.title}
           </h1>
+          <div className="mt-3 flex items-center gap-2">
+            <AnimatedStars />
+            <span className="text-sm text-white/80">4.8 rating</span>
+          </div>
         </div>
         <div className="absolute inset-0 bg-black/10" />
       </div>
@@ -312,147 +333,193 @@ export default function CourseDetailPage() {
         </Card>
       </div>
 
-      {course.description && (
-        <section>
-          <h2 className="mb-3 text-xl font-semibold">About This Course</h2>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {course.description}
-          </p>
-        </section>
-      )}
-
-      {bullets && bullets.length > 0 && (
-        <section>
-          <h2 className="mb-3 text-xl font-semibold">What You&apos;ll Learn</h2>
-          <ul className="grid gap-2 sm:grid-cols-2">
-            {bullets.map((item, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm">
-                <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
-                <span>{item.replace(/^[•\-\s]+/, '')}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {course.chapters.length > 0 && (
-        <section>
-          <h2 className="mb-3 text-xl font-semibold">Syllabus</h2>
-          <Accordion type="multiple" className="space-y-2">
-            {course.chapters.map((chapter) => (
-              <AccordionItem
-                key={chapter.id}
-                value={chapter.id}
-                className="rounded-lg border"
-              >
-                <AccordionTrigger className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium hover:bg-muted/50">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-6 w-6 items-center justify-center rounded bg-muted text-xs font-bold">
-                      {chapter.order}
-                    </span>
-                    <span>{chapter.title}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    {chapter.videos.length} videos
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="divide-y px-4 pb-2">
-                  {chapter.videos.map((video) => (
-                    <button
-                      key={video.id}
-                      onClick={() =>
-                        router.push(
-                          `/courses/${course.id}/learn?video=${video.id}`,
-                        )
-                      }
-                      className="flex w-full items-center gap-3 py-2.5 text-left text-sm hover:bg-muted/50"
-                    >
-                      <Play className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                      <span className="flex-1 truncate">{video.title}</span>
-                      {video.duration && (
-                        <span className="shrink-0 text-xs text-muted-foreground">
-                          {formatDuration(video.duration)}
-                        </span>
-                      )}
-                    </button>
-                  ))}
-                  {chapter.videos.length === 0 && (
-                    <p className="py-3 text-center text-xs text-muted-foreground">
-                      No videos in this chapter yet.
-                    </p>
-                  )}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </section>
-      )}
-
-      <Separator />
-
-      <section className="flex flex-col items-center text-center">
-        {course.enrollment ? (
-          <div className="w-full max-w-md space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Your Progress</span>
-                <span className="font-medium">
-                  {Math.round(course.enrollment.progress)}%
-                </span>
-              </div>
-              <Progress
-                value={course.enrollment.progress}
-                className="h-2"
-              />
-            </div>
-            <Button
-              className="w-full"
-              onClick={() =>
-                router.push(`/courses/${course.id}/learn`)
-              }
-            >
-              Continue Learning
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        ) : course.type === 'FREE' ? (
-          <div className="w-full max-w-md space-y-3">
-            <Button
-              size="lg"
-              className="w-full"
-              onClick={handleEnroll}
-              disabled={enrolling}
-            >
-              {enrolling ? 'Enrolling...' : 'Enroll Now'}
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
-            {!session && (
-              <p className="text-xs text-muted-foreground">
-                You will need to sign in to enroll.
+      <div className="grid gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-8">
+          {course.description && (
+            <section>
+              <h2 className="mb-3 text-xl font-semibold">About This Course</h2>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {course.description}
               </p>
-            )}
+            </section>
+          )}
+
+          {bullets && bullets.length > 0 && (
+            <section>
+              <h2 className="mb-3 text-xl font-semibold">What You&apos;ll Learn</h2>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {bullets.map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-2.5 rounded-lg border p-3 text-sm"
+                  >
+                    <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
+                    <span>{item.replace(/^[•\-\s]+/, '')}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {course.chapters.length > 0 && (
+            <section>
+              <h2 className="mb-3 text-xl font-semibold">Syllabus</h2>
+              <Accordion type="multiple" className="space-y-2">
+                {course.chapters.map((chapter) => (
+                  <AccordionItem
+                    key={chapter.id}
+                    value={chapter.id}
+                    className="rounded-lg border"
+                  >
+                    <AccordionTrigger className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium hover:bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-6 w-6 items-center justify-center rounded bg-muted text-xs font-bold">
+                          {chapter.order}
+                        </span>
+                        <span>{chapter.title}</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {chapter.videos.length} videos
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent className="divide-y px-4 pb-2">
+                      {chapter.videos.map((video) => (
+                        <button
+                          key={video.id}
+                          onClick={() =>
+                            router.push(
+                              `/courses/${course.id}/learn?video=${video.id}`,
+                            )
+                          }
+                          className="flex w-full items-center gap-3 py-2.5 text-left text-sm hover:bg-muted/50"
+                        >
+                          <Play className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                          <span className="flex-1 truncate">{video.title}</span>
+                          {video.duration && (
+                            <span className="shrink-0 text-xs text-muted-foreground">
+                              {formatDuration(video.duration)}
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                      {chapter.videos.length === 0 && (
+                        <p className="py-3 text-center text-xs text-muted-foreground">
+                          No videos in this chapter yet.
+                        </p>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </section>
+          )}
+        </div>
+
+        <div className="lg:col-span-1">
+          <Separator className="lg:hidden" />
+
+          <div className="sticky top-24 space-y-6">
+            <Card className="shadow-lg border-2 border-[#185FA5]/10">
+              <CardContent className="p-6 text-center">
+                {course.enrollment ? (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Progress</span>
+                        <span className="font-bold">
+                          {Math.round(course.enrollment.progress)}%
+                        </span>
+                      </div>
+                      <Progress
+                        value={course.enrollment.progress}
+                        className="h-2.5"
+                      />
+                    </div>
+                    <Button
+                      className="w-full"
+                      size="lg"
+                      onClick={() =>
+                        router.push(`/courses/${course.id}/learn`)
+                      }
+                    >
+                      Continue Learning
+                      <ChevronRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : course.type === 'FREE' ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-center gap-1 text-3xl font-bold text-green-600">
+                      FREE
+                    </div>
+                    <Button
+                      size="lg"
+                      className="w-full"
+                      onClick={handleEnroll}
+                      disabled={enrolling}
+                    >
+                      {enrolling ? 'Enrolling...' : 'Enroll Now — Free'}
+                      <ChevronRight className="ml-2 h-4 w-4" />
+                    </Button>
+                    {!session && (
+                      <p className="text-xs text-muted-foreground">
+                        You will need to sign in to enroll.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-center gap-1 text-3xl font-bold text-[#185FA5]">
+                      <DollarSign className="h-7 w-7" />
+                      {formatBDT(course.price)}
+                    </div>
+                    <Button
+                      size="lg"
+                      className="w-full"
+                      onClick={handleCheckout}
+                      disabled={checkingOut}
+                    >
+                      {checkingOut
+                        ? 'Redirecting...'
+                        : `Enroll Now — ${formatBDT(course.price)}`}
+                      <ChevronRight className="ml-2 h-4 w-4" />
+                    </Button>
+                    <p className="text-xs text-muted-foreground">
+                      Secure payment. Full lifetime access.
+                    </p>
+                    <Separator />
+                    <div className="text-left space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="text-muted-foreground">
+                          {totalVideos} on-demand videos
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="text-muted-foreground">
+                          {course.chapters.length} chapters
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="text-muted-foreground">
+                          Certificate of completion
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="text-muted-foreground">
+                          Full lifetime access
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
-        ) : (
-          <div className="w-full max-w-md space-y-4">
-            <div className="flex items-center justify-center gap-2 text-2xl font-bold">
-              <DollarSign className="h-6 w-6 text-amber-500" />
-              {formatBDT(course.price)}
-            </div>
-            <Button
-              size="lg"
-              className="w-full"
-              onClick={handleCheckout}
-              disabled={checkingOut}
-            >
-              {checkingOut ? 'Redirecting to payment...' : `Buy for ${formatBDT(course.price)}`}
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              You will be redirected to our secure payment gateway.
-            </p>
-          </div>
-        )}
-      </section>
+        </div>
+      </div>
     </div>
   );
 }

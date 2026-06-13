@@ -3,9 +3,6 @@
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
   Skeleton,
   Badge,
   Button,
@@ -16,11 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@ris-academy/ui';
-import { BookOpen, Search, Filter, Clock, Users, Play } from 'lucide-react';
+import { BookOpen, Search, Filter, Clock, Users, Star, GraduationCap } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, useCallback } from 'react';
 import { cn, formatBDT } from '@/lib/utils';
-import { CourseFilters } from '@ris-academy/types';
 import { toast } from 'sonner';
 
 type CourseItem = {
@@ -66,6 +62,24 @@ const subjectGradients: Record<string, string> = {
   ICT: 'from-orange-500 to-amber-600',
   Bangla: 'from-red-500 to-rose-600',
 };
+
+function AnimatedStars() {
+  return (
+    <div className="flex items-center gap-0.5">
+      {[350, 500, 700, 900, 1100].map((duration, i) => (
+        <div
+          key={i}
+          className="relative"
+          style={{
+            animation: `star-beat ${duration}ms ease-in-out infinite`,
+          }}
+        >
+          <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<CourseItem[]>([]);
@@ -166,24 +180,26 @@ export default function CoursesPage() {
       </div>
 
       {loading ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="space-y-4">
+          {Array.from({ length: 5 }).map((_, i) => (
             <Card key={i} className="overflow-hidden">
-              <Skeleton className="h-44 w-full rounded-none" />
-              <CardContent className="space-y-3 p-5">
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-5 w-16 rounded-full" />
-                  <Skeleton className="h-5 w-20 rounded-full" />
+              <div className="flex flex-col sm:flex-row">
+                <Skeleton className="h-48 w-full sm:h-44 sm:w-56 rounded-none" />
+                <div className="flex-1 p-5 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                    <Skeleton className="h-5 w-20 rounded-full" />
+                  </div>
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
+                  <div className="flex items-center gap-4 pt-1">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
                 </div>
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-2/3" />
-                <div className="flex items-center gap-4 pt-1">
-                  <Skeleton className="h-4 w-16" />
-                  <Skeleton className="h-4 w-16" />
-                </div>
-                <Skeleton className="h-9 w-full" />
-              </CardContent>
+                <Skeleton className="h-12 w-full sm:w-32 m-5" />
+              </div>
             </Card>
           ))}
         </div>
@@ -205,25 +221,38 @@ export default function CoursesPage() {
           )}
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="space-y-4">
           {courses.map((course) => (
-            <Link key={course.id} href={`/courses/${course.id}`}>
-              <Card className="group h-full overflow-hidden transition-shadow hover:shadow-md">
-                <div className="relative h-44">
-                  <div
-                    className={cn(
-                      'flex h-full w-full items-center justify-center bg-gradient-to-br',
-                      subjectGradients[course.subject] ||
-                        'from-gray-500 to-gray-700',
-                    )}
-                  >
-                    <Play className="h-12 w-12 text-white/80 transition-transform group-hover:scale-110" />
-                  </div>
+            <Card
+              key={course.id}
+              className="group overflow-hidden transition-shadow hover:shadow-md"
+            >
+              <div className="flex flex-col sm:flex-row">
+                <Link
+                  href={`/courses/${course.id}`}
+                  className="relative block h-48 w-full shrink-0 overflow-hidden sm:h-44 sm:w-56"
+                >
+                  {course.thumbnail ? (
+                    <img
+                      src={course.thumbnail}
+                      alt={course.title}
+                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    />
+                  ) : (
+                    <div
+                      className={cn(
+                        'flex h-full w-full items-center justify-center bg-gradient-to-br',
+                        subjectGradients[course.subject] ||
+                          'from-gray-500 to-gray-700',
+                      )}
+                    >
+                      <GraduationCap className="h-12 w-12 text-white/60 transition-transform group-hover:scale-110" />
+                    </div>
+                  )}
                   <Badge className="absolute left-3 top-3">
                     {course.subject}
                   </Badge>
                   <Badge
-                    variant={course.type === 'FREE' ? 'default' : 'secondary'}
                     className={cn(
                       'absolute right-3 top-3',
                       course.type === 'FREE'
@@ -235,22 +264,29 @@ export default function CoursesPage() {
                       ? 'FREE'
                       : `PAID ${formatBDT(course.price)}`}
                   </Badge>
-                </div>
-                <CardContent className="flex h-[calc(100%-11rem)] flex-col p-5">
-                  <CardTitle className="line-clamp-2 text-base leading-snug">
-                    {course.title}
-                  </CardTitle>
-                  <CardDescription className="mt-1 line-clamp-2 text-xs">
+                </Link>
+
+                <div className="flex flex-1 flex-col p-5">
+                  <Link href={`/courses/${course.id}`}>
+                    <h3 className="text-lg font-semibold leading-snug hover:text-[#185FA5] transition-colors line-clamp-1">
+                      {course.title}
+                    </h3>
+                  </Link>
+                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                     {course.description || 'No description available'}
-                  </CardDescription>
-                  {course.instructorName && (
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      {course.instructorName}
-                    </p>
-                  )}
-                  <div className="mt-auto flex items-center gap-4 pt-3 text-xs text-muted-foreground">
+                  </p>
+
+                  <div className="mt-2 flex items-center gap-2">
+                    <AnimatedStars />
+                    <span className="text-xs text-muted-foreground">(4.8)</span>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-1 text-xs text-muted-foreground">
+                    {course.instructorName && (
+                      <span>{course.instructorName}</span>
+                    )}
                     <span className="flex items-center gap-1">
-                      <Play className="h-3.5 w-3.5" />
+                      <Clock className="h-3.5 w-3.5" />
                       {course._count.chapters} chapters
                     </span>
                     <span className="flex items-center gap-1">
@@ -258,16 +294,15 @@ export default function CoursesPage() {
                       {course._count.enrollments} students
                     </span>
                   </div>
-                  <Button
-                    variant="outline"
-                    className="mt-4 w-full"
-                    asChild
-                  >
-                    <span>View Details</span>
+                </div>
+
+                <div className="flex items-center p-5 sm:pr-6">
+                  <Button asChild className="w-full sm:w-auto whitespace-nowrap">
+                    <Link href={`/courses/${course.id}`}>View Details</Link>
                   </Button>
-                </CardContent>
-              </Card>
-            </Link>
+                </div>
+              </div>
+            </Card>
           ))}
         </div>
       )}
