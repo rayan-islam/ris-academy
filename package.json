@@ -20,7 +20,6 @@
     "clean": "turbo clean"
   },
   "devDependencies": {
-    "@types/nodemailer": "^8.0.1",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.57.0",
@@ -37,6 +36,6 @@
     "@aws-sdk/client-s3": "^3.1068.0",
     "@aws-sdk/s3-request-presigner": "^3.1068.0",
     "esbuild": "^0.28.0",
-    "nodemailer": "^7.0.13"
+    "resend": "^6.12.4"
   }
 }
