@@ -52,15 +52,20 @@ export default function SignUpPage() {
         body: JSON.stringify(data),
       });
 
-      const json: { success: boolean; error?: string } = await res.json();
+      const json: { success: boolean; data?: { email: string; requiresVerification?: boolean; message?: string }; error?: string } = await res.json();
 
       if (!res.ok || !json.success) {
         toast.error(json.error || 'Registration failed');
         return;
       }
 
-      toast.success('Account created successfully! Please sign in.');
-      router.push('/login?registered=true');
+      if (json.data?.requiresVerification) {
+        toast.success(json.data.message || 'Check your email for the verification code');
+        router.push(`/verify-otp?email=${encodeURIComponent(json.data.email)}`);
+      } else {
+        toast.success('Account created successfully! Please sign in.');
+        router.push('/login?registered=true');
+      }
     } catch {
       toast.error('Something went wrong. Please try again.');
     } finally {
