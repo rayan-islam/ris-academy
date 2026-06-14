@@ -162,14 +162,14 @@ export function Navbar() {
           ) : (
             <>
               <Button variant="ghost" asChild>
-                <Link href="/auth/signin">Sign In</Link>
+                <Link href="/login">Sign In</Link>
               </Button>
               <Button
                 asChild
                 style={{ backgroundColor: '#185FA5' }}
                 className="text-white hover:bg-[#185FA5]/90"
               >
-                <Link href="/auth/register">Get Started</Link>
+                <Link href="/signup">Get Started</Link>
               </Button>
             </>
           )}
@@ -322,14 +322,14 @@ export function Navbar() {
               ) : (
                 <>
                   <Link
-                    href="/auth/signin"
+                    href="/login"
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-[#185FA5] dark:text-gray-300 dark:hover:bg-gray-800"
                   >
                     Sign In
                   </Link>
                   <Link
-                    href="/auth/register"
+                    href="/signup"
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-white transition-colors"
                     style={{ backgroundColor: '#185FA5' }}
