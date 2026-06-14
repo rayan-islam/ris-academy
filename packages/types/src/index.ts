@@ -181,3 +181,16 @@ export interface AdminStats {
   activeStudents: number;
   recentEnrollments: number;
 }
+
+// ─── Materials ───────────────────────────────────────────
+
+export interface MaterialCreateInput {
+  title: string;
+  fileUrl: string;
+  fileType: string;
+  fileSize?: number;
+  subject: string;
+  chapter?: string;
+}
+
+export interface MaterialUpdateInput extends Partial<MaterialCreateInput> {}

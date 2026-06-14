@@ -27,7 +27,7 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: 'MAIN',
     items: [
-      { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     ],
   },
   {
@@ -41,7 +41,7 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: 'USERS',
     items: [
-      { href: '/admin/users', label: 'Students', icon: Users },
+      { href: '/admin/students', label: 'Students', icon: Users },
     ],
   },
   {
@@ -63,7 +63,7 @@ export function AdminSidebar() {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
-    if (href === '/admin') return pathname === '/admin';
+    if (href === '/admin/dashboard') return pathname === '/admin/dashboard';
     return pathname.startsWith(href);
   };
 

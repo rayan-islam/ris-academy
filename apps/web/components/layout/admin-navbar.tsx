@@ -85,11 +85,11 @@ export function AdminNavbar() {
         <div className="border-b bg-white dark:bg-gray-950 lg:hidden">
           <div className="space-y-1 px-4 py-3">
             {[
-              { href: '/admin', label: 'Dashboard' },
+              { href: '/admin/dashboard', label: 'Dashboard' },
               { href: '/admin/courses', label: 'Courses' },
               { href: '/admin/exams', label: 'Exams' },
               { href: '/admin/question-bank', label: 'Question Bank' },
-              { href: '/admin/users', label: 'Students' },
+              { href: '/admin/students', label: 'Students' },
               { href: '/admin/payments', label: 'Payments' },
               { href: '/admin/materials', label: 'Materials' },
               { href: '/admin/notifications', label: 'Notifications' },
