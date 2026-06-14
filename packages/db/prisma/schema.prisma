@@ -59,6 +59,8 @@ model User {
   name           String?
   email          String    @unique
   emailVerified  DateTime?
+  otp            String?
+  otpExpires     DateTime?
   password       String?
   image          String?
   role           Role      @default(STUDENT)

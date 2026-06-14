@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { db } from '@ris-academy/db';
 import { registerSchema } from '@/lib/validators';
 import { apiSuccess, apiError } from '@/lib/api-utils';
+import { sendOTPEmail, generateOTP } from '@/lib/email';
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,6 +22,8 @@ export async function POST(req: NextRequest) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
     const user = await db.user.create({
       data: {
@@ -30,15 +33,23 @@ export async function POST(req: NextRequest) {
         hscYear,
         institution,
         phone,
+        otp,
+        otpExpires,
       },
     });
+
+    try {
+      await sendOTPEmail(email, otp);
+    } catch {
+      console.warn('Failed to send OTP email, user can resend from verify page');
+    }
 
     return apiSuccess(
       {
         id: user.id,
-        name: user.name,
         email: user.email,
-        message: 'Registration successful',
+        requiresVerification: true,
+        message: 'Registration successful. Please check your email for verification code.',
       },
       201,
     );
