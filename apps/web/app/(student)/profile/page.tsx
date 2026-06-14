@@ -32,6 +32,7 @@ import {
 import {
   Camera,
   Loader2,
+  Upload,
   Receipt,
   Award,
 } from 'lucide-react';
@@ -60,6 +61,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   const {
     register,
@@ -136,6 +138,42 @@ export default function ProfilePage() {
     toast.success('Photo URL updated');
   }
 
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPhoto(true);
+    try {
+      const presignedRes = await fetch('/api/upload/presigned-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName: file.name,
+          contentType: file.type,
+          folder: 'users',
+        }),
+      });
+      if (!presignedRes.ok) throw new Error('Failed to get upload URL');
+      const { uploadUrl, publicUrl } = await presignedRes.json();
+
+      await fetch(uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': file.type },
+      });
+
+      setImageUrl(publicUrl);
+      setValue('image', publicUrl, { shouldDirty: true });
+      if (profile) {
+        setProfile({ ...profile, image: publicUrl });
+      }
+      toast.success('Photo uploaded');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   if (loading) return null;
 
   if (!profile) {
@@ -186,12 +224,20 @@ export default function ProfilePage() {
 
               <div className="w-full space-y-3">
                 <Label htmlFor="photo-url">Photo URL</Label>
-                <Input
-                  id="photo-url"
-                  placeholder="https://example.com/photo.jpg"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="photo-url"
+                    placeholder="https://example.com/photo.jpg"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    className="flex-1"
+                  />
+                  <label className="inline-flex cursor-pointer items-center gap-1 rounded-md border px-3 py-2 text-sm hover:bg-muted">
+                    <Upload className="h-4 w-4" />
+                    {uploadingPhoto ? 'Uploading...' : 'Upload'}
+                    <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} disabled={uploadingPhoto} />
+                  </label>
+                </div>
                 <Button
                   variant="outline"
                   className="w-full"

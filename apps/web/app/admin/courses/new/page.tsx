@@ -1,15 +1,15 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ris-academy/ui';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, Upload } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { courseCreateSchema } from '@/lib/validators';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import Link from 'next/link';
 import { useState } from 'react';
+import Link from 'next/link';
 
 type FormData = z.infer<typeof courseCreateSchema>;
 
@@ -34,6 +34,39 @@ export default function CreateCoursePage() {
   });
 
   const courseType = watch('type');
+  const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
+
+  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingThumbnail(true);
+    try {
+      const presignedRes = await fetch('/api/upload/presigned-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName: file.name,
+          contentType: file.type,
+          folder: 'courses',
+        }),
+      });
+      if (!presignedRes.ok) throw new Error('Failed to get upload URL');
+      const { uploadUrl, publicUrl } = await presignedRes.json();
+
+      await fetch(uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': file.type },
+      });
+
+      setValue('thumbnail', publicUrl);
+      toast.success('Thumbnail uploaded');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploadingThumbnail(false);
+    }
+  };
 
   const onSubmit = async (formData: FormData) => {
     setSubmitting(true);
@@ -145,7 +178,14 @@ export default function CreateCoursePage() {
 
               <div className="space-y-2">
                 <Label htmlFor="thumbnailUrl">Thumbnail URL</Label>
-                <Input id="thumbnailUrl" {...register('thumbnail')} placeholder="https://..." />
+                <div className="flex gap-2">
+                  <Input id="thumbnailUrl" {...register('thumbnail')} placeholder="https://..." className="flex-1" />
+                  <label className="inline-flex cursor-pointer items-center gap-1 rounded-md border px-3 py-2 text-sm hover:bg-muted">
+                    <Upload className="h-4 w-4" />
+                    {uploadingThumbnail ? 'Uploading...' : 'Upload'}
+                    <input type="file" accept="image/*" className="hidden" onChange={handleThumbnailUpload} disabled={uploadingThumbnail} />
+                  </label>
+                </div>
                 {errors.thumbnail && <p className="text-sm text-destructive">{errors.thumbnail.message}</p>}
               </div>
             </div>

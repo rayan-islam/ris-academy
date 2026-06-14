@@ -31,6 +31,7 @@ import {
   ChevronRight,
   Play,
   Clock,
+  Upload,
 } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -109,6 +110,7 @@ export default function EditCoursePage() {
   const [savingVideo, setSavingVideo] = useState(false);
 
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
+  const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
 
   const {
     register,
@@ -124,6 +126,38 @@ export default function EditCoursePage() {
 
   const courseType = watch('type');
   const isPublished = watch('isPublished' as any) as boolean;
+
+  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingThumbnail(true);
+    try {
+      const presignedRes = await fetch('/api/upload/presigned-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName: file.name,
+          contentType: file.type,
+          folder: 'courses',
+        }),
+      });
+      if (!presignedRes.ok) throw new Error('Failed to get upload URL');
+      const { uploadUrl, publicUrl } = await presignedRes.json();
+
+      await fetch(uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': file.type },
+      });
+
+      setValue('thumbnail', publicUrl);
+      toast.success('Thumbnail uploaded');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploadingThumbnail(false);
+    }
+  };
 
   const fetchCourse = useCallback(async () => {
     setLoading(true);
@@ -416,7 +450,14 @@ export default function EditCoursePage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="thumbnail">Thumbnail URL</Label>
-                    <Input id="thumbnail" {...register('thumbnail')} placeholder="https://..." />
+                    <div className="flex gap-2">
+                      <Input id="thumbnail" {...register('thumbnail')} placeholder="https://..." className="flex-1" />
+                      <label className="inline-flex cursor-pointer items-center gap-1 rounded-md border px-3 py-2 text-sm hover:bg-muted">
+                        <Upload className="h-4 w-4" />
+                        {uploadingThumbnail ? 'Uploading...' : 'Upload'}
+                        <input type="file" accept="image/*" className="hidden" onChange={handleThumbnailUpload} disabled={uploadingThumbnail} />
+                      </label>
+                    </div>
                   </div>
                 </div>
 
