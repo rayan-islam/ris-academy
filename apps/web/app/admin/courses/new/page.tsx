@@ -53,11 +53,12 @@ export default function CreateCoursePage() {
       if (!presignedRes.ok) throw new Error('Failed to get upload URL');
       const { uploadUrl, publicUrl } = await presignedRes.json();
 
-      await fetch(uploadUrl, {
+      const putRes = await fetch(uploadUrl, {
         method: 'PUT',
         body: file,
         headers: { 'Content-Type': file.type },
       });
+      if (!putRes.ok) throw new Error(`Upload failed: ${putRes.status}`);
 
       setValue('thumbnail', publicUrl);
       toast.success('Thumbnail uploaded');

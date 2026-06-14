@@ -155,11 +155,12 @@ export default function ProfilePage() {
       if (!presignedRes.ok) throw new Error('Failed to get upload URL');
       const { uploadUrl, publicUrl } = await presignedRes.json();
 
-      await fetch(uploadUrl, {
+      const putRes = await fetch(uploadUrl, {
         method: 'PUT',
         body: file,
         headers: { 'Content-Type': file.type },
       });
+      if (!putRes.ok) throw new Error(`Upload failed: ${putRes.status}`);
 
       setImageUrl(publicUrl);
       setValue('image', publicUrl, { shouldDirty: true });
@@ -167,11 +168,12 @@ export default function ProfilePage() {
         setProfile({ ...profile, image: publicUrl });
       }
 
-      await fetch('/api/users/me', {
+      const saveRes = await fetch('/api/users/me', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: publicUrl }),
       });
+      if (!saveRes.ok) throw new Error('Failed to save photo to profile');
 
       toast.success('Photo uploaded');
     } catch (err) {
