@@ -11,30 +11,12 @@ function getS3Client(): S3Client {
     throw new Error('R2 credentials not configured');
   }
 
-  const client = new S3Client({
+  return new S3Client({
     region: 'auto',
     endpoint,
     credentials: { accessKeyId, secretAccessKey },
+    requestChecksumCalculation: 'WHEN_REQUIRED' as any,
   });
-
-  (client.middlewareStack as any).addRelativeTo(
-    (next: any) => async (args: any) => {
-      const { request } = args;
-      if (request?.headers) {
-        delete request.headers['x-amz-checksum-crc32'];
-        delete request.headers['x-amz-sdk-checksum-algorithm'];
-        delete request.headers['x-amz-checksum-sha256'];
-      }
-      return next(args);
-    },
-    {
-      name: 'removeChecksumHeaders',
-      toMiddleware: 'build',
-      relation: 'after' as any,
-    } as any
-  );
-
-  return client;
 }
 
 export async function getPresignedUploadUrl(
