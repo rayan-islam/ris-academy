@@ -22,6 +22,14 @@ export async function POST(req: NextRequest) {
     const uploadUrl = await getPresignedUploadUrl(key, contentType);
     const publicUrl = getPublicUrl(key);
 
+    console.log('=== R2 DEBUG ===');
+    console.log('Key:', key);
+    console.log('Upload URL:', uploadUrl);
+    console.log('Public URL:', publicUrl);
+    console.log('Endpoint:', process.env.R2_ENDPOINT);
+    console.log('Bucket:', process.env.R2_BUCKET_NAME);
+    console.log('===============');
+
     return apiSuccess({ uploadUrl, publicUrl, key });
   } catch (error) {
     if (error instanceof AuthError) return apiError(error.message, error.status);
