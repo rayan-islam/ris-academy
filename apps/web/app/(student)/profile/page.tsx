@@ -166,6 +166,13 @@ export default function ProfilePage() {
       if (profile) {
         setProfile({ ...profile, image: publicUrl });
       }
+
+      await fetch('/api/users/me', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: publicUrl }),
+      });
+
       toast.success('Photo uploaded');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Upload failed');
