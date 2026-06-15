@@ -2,6 +2,35 @@ import { NextRequest } from 'next/server';
 import { db } from '@ris-academy/db';
 import { apiSuccess, apiError, requireAdmin, AuthError } from '@/lib/api-utils';
 
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  try {
+    await requireAdmin();
+
+    const body = await req.json();
+    const existing = await db.question.findUnique({ where: { id: params.id } });
+    if (!existing) return apiError('Question not found', 404);
+
+    const question = await db.question.update({
+      where: { id: params.id },
+      data: {
+        ...(body.order !== undefined && { order: body.order }),
+        ...(body.marks !== undefined && { marks: body.marks }),
+        ...(body.stem !== undefined && { stem: body.stem }),
+        ...(body.difficulty !== undefined && { difficulty: body.difficulty }),
+      },
+    });
+
+    return apiSuccess(question);
+  } catch (error) {
+    if (error instanceof AuthError) return apiError(error.message, error.status);
+    console.error('Admin patch question error:', error);
+    return apiError('Failed to update question', 500);
+  }
+}
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } },

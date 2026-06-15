@@ -3,6 +3,31 @@ import { db } from '@ris-academy/db';
 import { apiSuccess, apiError, requireAdmin, AuthError } from '@/lib/api-utils';
 import { courseCreateSchema } from '@/lib/validators';
 
+export async function GET(req: NextRequest) {
+  try {
+    await requireAdmin();
+
+    const { searchParams } = new URL(req.url);
+    const search = searchParams.get('search') || '';
+
+    const where = search
+      ? { title: { contains: search, mode: 'insensitive' as const } }
+      : {};
+
+    const courses = await db.course.findMany({
+      where,
+      include: { _count: { select: { enrollments: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return apiSuccess(courses);
+  } catch (error) {
+    if (error instanceof AuthError) return apiError(error.message, error.status);
+    console.error('Admin list courses error:', error);
+    return apiError('Failed to fetch courses', 500);
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     await requireAdmin();
