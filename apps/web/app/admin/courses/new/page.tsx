@@ -50,7 +50,7 @@ export default function CreateCoursePage() {
         const errJson = await uploadRes.json().catch(() => null);
         throw new Error(errJson?.error || 'Upload failed');
       }
-      const { url: publicUrl } = await uploadRes.json();
+      const { url: publicUrl } = (await uploadRes.json()).data;
 
       setValue('thumbnail', publicUrl);
       toast.success('Thumbnail uploaded');

@@ -155,7 +155,7 @@ export default function ProfilePage() {
         const errJson = await uploadRes.json().catch(() => null);
         throw new Error(errJson?.error || 'Upload failed');
       }
-      const { url: publicUrl } = await uploadRes.json();
+      const { url: publicUrl } = (await uploadRes.json()).data;
 
       setImageUrl(publicUrl);
       setValue('image', publicUrl, { shouldDirty: true });
