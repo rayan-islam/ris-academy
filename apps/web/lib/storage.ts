@@ -16,6 +16,7 @@ function getS3Client(): S3Client {
     endpoint,
     credentials: { accessKeyId, secretAccessKey },
     requestChecksumCalculation: 'WHEN_REQUIRED' as any,
+    forcePathStyle: true,
   });
 }
 
