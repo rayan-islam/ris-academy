@@ -143,24 +143,19 @@ export default function ProfilePage() {
     if (!file) return;
     setUploadingPhoto(true);
     try {
-      const presignedRes = await fetch('/api/upload/presigned-url', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fileName: file.name,
-          contentType: file.type,
-          folder: 'users',
-        }),
-      });
-      if (!presignedRes.ok) throw new Error('Failed to get upload URL');
-      const { uploadUrl, publicUrl } = await presignedRes.json();
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', 'users');
 
-      const putRes = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: file,
-        headers: { 'Content-Type': file.type },
+      const uploadRes = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
       });
-      if (!putRes.ok) throw new Error(`Upload failed: ${putRes.status}`);
+      if (!uploadRes.ok) {
+        const errJson = await uploadRes.json().catch(() => null);
+        throw new Error(errJson?.error || 'Upload failed');
+      }
+      const { url: publicUrl } = await uploadRes.json();
 
       setImageUrl(publicUrl);
       setValue('image', publicUrl, { shouldDirty: true });
