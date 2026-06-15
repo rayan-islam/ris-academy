@@ -197,7 +197,7 @@ export default function ProfilePage() {
         <aside className="space-y-6">
           <Card>
             <CardContent className="flex flex-col items-center pt-6">
-              <Avatar className="h-28 w-28">
+              <Avatar className="h-28 w-28" key={profile.image || 'default'}>
                 <AvatarImage src={profile.image ?? ''} alt={profile.name} />
                 <AvatarFallback className="text-3xl">
                   {getInitials(profile.name)}
