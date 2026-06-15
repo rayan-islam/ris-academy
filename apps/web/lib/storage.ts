@@ -40,11 +40,11 @@ export async function getPresignedUploadUrl(
 
 export function getPublicUrl(key: string): string {
   const publicBase = process.env.R2_PUBLIC_URL;
+  const bucket = process.env.R2_BUCKET_NAME!;
   if (publicBase) {
-    return `${publicBase.replace(/\/$/, '')}/${key}`;
+    return `${publicBase.replace(/\/$/, '')}/${bucket}/${key}`;
   }
   const endpoint = process.env.R2_ENDPOINT!;
-  const bucket = process.env.R2_BUCKET_NAME!;
   return `${endpoint}/${bucket}/${key}`;
 }
 
