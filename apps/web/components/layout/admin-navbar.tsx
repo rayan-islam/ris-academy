@@ -4,6 +4,7 @@ import {
   Button,
   Avatar,
   AvatarFallback,
+  AvatarImage,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -50,6 +51,7 @@ export function AdminNavbar() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 pl-2 pr-3">
                 <Avatar className="h-8 w-8">
+                  <AvatarImage src={user?.image ?? ''} alt={user?.name ?? ''} />
                   <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
                 </Avatar>
                 <span className="hidden text-sm font-medium md:inline">
