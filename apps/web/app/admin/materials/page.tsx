@@ -293,7 +293,7 @@ export default function MaterialsPage() {
                             <Link
                               href={m.fileUrl}
                               target="_blank"
-                              className="text-muted-foreground hover:text-[#185FA5]"
+                              className="text-muted-foreground hover:text-navy"
                             >
                               <ExternalLink className="h-3.5 w-3.5" />
                             </Link>

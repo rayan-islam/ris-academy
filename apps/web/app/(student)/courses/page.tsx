@@ -268,7 +268,7 @@ export default function CoursesPage() {
 
                 <div className="flex flex-1 flex-col p-5">
                   <Link href={`/courses/${course.id}`}>
-                    <h3 className="text-lg font-semibold leading-snug hover:text-[#185FA5] transition-colors line-clamp-1">
+                    <h3 className="text-lg font-semibold leading-snug hover:text-saffron transition-colors line-clamp-1">
                       {course.title}
                     </h3>
                   </Link>

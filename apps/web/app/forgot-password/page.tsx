@@ -37,8 +37,8 @@ export default function ForgotPasswordPage() {
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#185FA5]/10">
-            <KeyRound className="h-6 w-6 text-[#185FA5]" />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-navy/10">
+            <KeyRound className="h-6 w-6 text-navy" />
           </div>
           <CardTitle className="text-2xl">Forgot Password</CardTitle>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -55,7 +55,7 @@ export default function ForgotPasswordPage() {
               </p>
               <Link
                 href="/login"
-                className="mt-4 inline-flex items-center gap-1 text-sm text-[#185FA5] hover:underline"
+                className="mt-4 inline-flex items-center gap-1 text-sm text-saffron hover:underline"
               >
                 <ArrowLeft className="h-3 w-3" />
                 Back to sign in
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
               <div className="text-center">
                 <Link
                   href="/login"
-                  className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-[#185FA5]"
+                  className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-saffron"
                 >
                   <ArrowLeft className="h-3 w-3" />
                   Back to sign in

@@ -38,7 +38,7 @@ export function AdminNavbar() {
           </Button>
           <div className="flex items-center gap-2.5 lg:hidden">
             <img src="/ris_academy_emblem.svg" alt="RI's Academy" className="h-7 w-auto" />
-            <span className="text-lg font-bold text-[#185FA5]">RI&apos;s Academy</span>
+            <span className="text-lg font-bold text-navy">RI&apos;s Academy</span>
           </div>
         </div>
 
@@ -107,7 +107,7 @@ export function AdminNavbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-[#185FA5] dark:text-gray-300 dark:hover:bg-gray-800"
+                className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800"
               >
                 {link.label}
               </Link>

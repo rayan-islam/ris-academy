@@ -78,7 +78,7 @@ function LoginForm() {
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#185FA5]/10">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-navy/10">
             <img src="/ris_academy_emblem.svg" alt="RI's Academy" className="h-7 w-auto" />
           </div>
           <CardTitle className="text-2xl">Welcome back</CardTitle>
@@ -140,7 +140,7 @@ function LoginForm() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link href="/forgot-password" className="text-xs text-[#185FA5] hover:underline">
+                <Link href="/forgot-password" className="text-xs text-saffron hover:underline">
                   Forgot Password?
                 </Link>
               </div>

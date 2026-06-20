@@ -36,7 +36,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12 md:py-16">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           <div>
-            <h3 className="text-lg font-bold text-[#185FA5]">RI&apos;s Academy</h3>
+            <h3 className="text-lg font-bold text-navy">RI&apos;s Academy</h3>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               A modern online learning platform for HSC students in Bangladesh.
               Expert-led courses, interactive exams, and comprehensive progress
@@ -50,7 +50,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={link.label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-[#185FA5] text-white transition-colors hover:bg-[#185FA5]/90"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-navy text-white transition-colors hover:bg-navy/90"
                 >
                   {link.icon}
                 </a>
@@ -127,7 +127,7 @@ export function Footer() {
               alt="RI's Academy"
               className="h-5 w-auto"
             />
-            <span className="text-sm font-bold text-[#185FA5]">RI&apos;s Academy</span>
+            <span className="text-sm font-bold text-navy">RI&apos;s Academy</span>
           </div>
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} RI&apos;s Academy. All rights

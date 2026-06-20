@@ -120,7 +120,7 @@ export default async function HomePage() {
                           />
                         </div>
                       ) : (
-                        <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-gradient-to-br from-[#185FA5] to-blue-700 flex items-center justify-center">
+                        <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-gradient-to-br from-navy to-blue-700 flex items-center justify-center">
                           <GraduationCap className="h-12 w-12 text-white/60" />
                         </div>
                       )}

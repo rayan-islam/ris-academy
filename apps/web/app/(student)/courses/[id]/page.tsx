@@ -419,7 +419,7 @@ export default function CourseDetailPage() {
           <Separator className="lg:hidden" />
 
           <div className="sticky top-24 space-y-6">
-            <Card className="shadow-lg border-2 border-[#185FA5]/10">
+            <Card className="shadow-lg border-2 border-navy/10">
               <CardContent className="p-6 text-center">
                 {course.enrollment ? (
                   <div className="space-y-4">
@@ -468,7 +468,7 @@ export default function CourseDetailPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="flex items-center justify-center gap-1 text-3xl font-bold text-[#185FA5]">
+                    <div className="flex items-center justify-center gap-1 text-3xl font-bold text-navy">
                       <DollarSign className="h-7 w-7" />
                       {formatBDT(course.price)}
                     </div>

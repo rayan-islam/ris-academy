@@ -181,7 +181,7 @@ export default function MyCoursesPage() {
               ) : (
                 <>
                   Browse our{' '}
-                  <Link href="/courses" className="font-medium text-[#185FA5] hover:underline">
+                  <Link href="/courses" className="font-medium text-saffron hover:underline">
                     course catalog
                   </Link>{' '}
                   and enroll today
@@ -275,7 +275,7 @@ export default function MyCoursesPage() {
               {filteredEnrolledCourses.map((course) => (
                 <Link key={course.id} href={`/courses/${course.id}`} className="group">
                   <Card className="h-full overflow-hidden transition-shadow hover:shadow-md">
-                    <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-[#185FA5]/20 to-[#185FA5]/5">
+                    <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-navy/20 to-navy/5">
                       {course.thumbnail ? (
                         <img
                           src={course.thumbnail}
@@ -284,7 +284,7 @@ export default function MyCoursesPage() {
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center">
-                          <BookOpen className="h-10 w-10 text-[#185FA5]/30" />
+                          <BookOpen className="h-10 w-10 text-navy/30" />
                         </div>
                       )}
                       {course.completed && (
@@ -296,7 +296,7 @@ export default function MyCoursesPage() {
                     <CardContent className="space-y-3 p-4">
                       <div>
                         <div className="flex items-start justify-between gap-2">
-                          <h3 className="line-clamp-1 text-sm font-semibold group-hover:text-[#185FA5]">
+                          <h3 className="line-clamp-1 text-sm font-semibold group-hover:text-saffron">
                             {course.title}
                           </h3>
                           <Badge variant="outline" className="shrink-0 text-xs">
@@ -323,7 +323,7 @@ export default function MyCoursesPage() {
                         </div>
                         <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                           <div
-                            className="h-full rounded-full bg-[#185FA5] transition-all"
+                            className="h-full rounded-full bg-navy transition-all"
                             style={{ width: `${Math.min(100, Math.max(0, course.progress))}%` }}
                           />
                         </div>

@@ -69,7 +69,7 @@ export default function PaymentReceiptPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <p className="text-lg font-medium">Payment not found</p>
-        <Link href="/payments" className="mt-2 text-sm text-[#185FA5] hover:underline">
+        <Link href="/payments" className="mt-2 text-sm text-navy hover:underline">
           Back to payment history
         </Link>
       </div>

@@ -57,8 +57,8 @@ function VerifyOTPForm() {
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#185FA5]/10">
-            <Mail className="h-6 w-6 text-[#185FA5]" />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-navy/10">
+            <Mail className="h-6 w-6 text-navy" />
           </div>
           <CardTitle className="text-2xl">Verify Your Email</CardTitle>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -85,7 +85,7 @@ function VerifyOTPForm() {
             <button
               type="button"
               onClick={handleResend}
-              className="text-sm text-[#185FA5] hover:underline"
+              className="text-sm text-saffron hover:underline"
             >
               Resend code
             </button>
@@ -93,7 +93,7 @@ function VerifyOTPForm() {
           <div className="text-center">
             <Link
               href="/login"
-              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-[#185FA5]"
+              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-saffron"
             >
               <ArrowLeft className="h-3 w-3" />
               Back to sign in
@@ -109,7 +109,7 @@ export default function VerifyOTPPage() {
   return (
     <Suspense fallback={
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#185FA5] border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-navy border-t-transparent" />
       </div>
     }>
       <VerifyOTPForm />

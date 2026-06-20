@@ -177,7 +177,7 @@ export default function DashboardPage() {
           <h2 className="text-xl font-semibold">Your Courses</h2>
           <Link
             href="/courses"
-            className="flex items-center gap-1 text-sm font-medium text-[#185FA5] hover:underline"
+            className="flex items-center gap-1 text-sm font-medium text-navy hover:underline"
           >
             Browse Courses
             <ArrowRight className="h-4 w-4" />
@@ -232,7 +232,7 @@ export default function DashboardPage() {
                     </div>
                     <Link
                       href={`/courses/${course.id}`}
-                      className="inline-flex items-center gap-1 text-sm font-medium text-[#185FA5] hover:underline"
+                      className="inline-flex items-center gap-1 text-sm font-medium text-navy hover:underline"
                     >
                       {course.progress > 0 ? 'Continue Learning' : 'View Course'}
                       <ArrowRight className="h-4 w-4" />
@@ -252,7 +252,7 @@ export default function DashboardPage() {
               </p>
               <Link
                 href="/courses"
-                className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#185FA5] hover:underline"
+                className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-navy hover:underline"
               >
                 Browse Courses
                 <ArrowRight className="h-4 w-4" />
@@ -267,7 +267,7 @@ export default function DashboardPage() {
           <h2 className="text-xl font-semibold">Upcoming Exams</h2>
           <Link
             href="/exams"
-            className="flex items-center gap-1 text-sm font-medium text-[#185FA5] hover:underline"
+            className="flex items-center gap-1 text-sm font-medium text-navy hover:underline"
           >
             View All Exams
             <ArrowRight className="h-4 w-4" />
@@ -313,7 +313,7 @@ export default function DashboardPage() {
                   </div>
                   <Link
                     href={`/exams/${exam.id}`}
-                    className="inline-flex items-center gap-1 rounded-md bg-[#185FA5] px-4 py-2 text-sm font-medium text-white hover:bg-[#185FA5]/90"
+                    className="inline-flex items-center gap-1 rounded-md bg-saffron px-4 py-2 text-sm font-medium text-white hover:bg-saffron/90"
                   >
                     Start Exam
                     <ArrowRight className="h-4 w-4" />
@@ -414,7 +414,7 @@ export default function DashboardPage() {
                         className={cn(
                           'w-full max-w-[32px] rounded-t transition-all',
                           hasActivity
-                            ? 'bg-[#185FA5]'
+                            ? 'bg-navy'
                             : 'bg-muted',
                         )}
                         style={{ height: `${Math.max(heightPercent, hasActivity ? 8 : 4)}px` }}
@@ -426,7 +426,7 @@ export default function DashboardPage() {
               </div>
               {data.studyStreak > 0 && (
                 <p className="mt-4 text-center text-sm text-muted-foreground">
-                  <span className="font-medium text-[#185FA5]">{data.studyStreak}-day</span> study streak this week
+                  <span className="font-medium text-navy">{data.studyStreak}-day</span> study streak this week
                 </p>
               )}
             </CardContent>

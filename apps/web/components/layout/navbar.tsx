@@ -51,7 +51,7 @@ export function Navbar() {
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2.5">
           <img src="/ris_academy_emblem.svg" alt="RI's Academy" className="h-8 w-auto" />
-          <span className="text-xl font-bold text-[#185FA5]">RI&apos;s Academy</span>
+          <span className="text-xl font-bold text-navy">RI&apos;s Academy</span>
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
@@ -65,8 +65,8 @@ export function Navbar() {
                 className={cn(
                   'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                   isActive
-                    ? 'bg-[#185FA5]/10 text-[#185FA5]'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-[#185FA5] dark:text-gray-300 dark:hover:bg-gray-800'
+                    ? 'bg-navy/10 text-navy'
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
                 )}
               >
                 <link.icon className="h-4 w-4" />
@@ -166,8 +166,7 @@ export function Navbar() {
               </Button>
               <Button
                 asChild
-                style={{ backgroundColor: '#185FA5' }}
-                className="text-white hover:bg-[#185FA5]/90"
+                className="bg-saffron text-white hover:bg-saffron/90"
               >
                 <Link href="/signup">Get Started</Link>
               </Button>
@@ -211,8 +210,8 @@ export function Navbar() {
                   className={cn(
                     'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-[#185FA5]/10 text-[#185FA5]'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-[#185FA5] dark:text-gray-300 dark:hover:bg-gray-800'
+                      ? 'bg-navy/10 text-navy'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
                   )}
                 >
                   <link.icon className="h-4 w-4" />
@@ -232,8 +231,8 @@ export function Navbar() {
                     className={cn(
                       'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
                       pathname === '/notifications'
-                        ? 'bg-[#185FA5]/10 text-[#185FA5]'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-[#185FA5] dark:text-gray-300 dark:hover:bg-gray-800'
+                        ? 'bg-navy/10 text-navy'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
                     )}
                   >
                     <Bell className="h-4 w-4" />
@@ -250,8 +249,8 @@ export function Navbar() {
                     className={cn(
                       'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
                       pathname === '/dashboard'
-                        ? 'bg-[#185FA5]/10 text-[#185FA5]'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-[#185FA5] dark:text-gray-300 dark:hover:bg-gray-800'
+                        ? 'bg-navy/10 text-navy'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
                     )}
                   >
                     <LayoutDashboard className="h-4 w-4" />
@@ -263,8 +262,8 @@ export function Navbar() {
                     className={cn(
                       'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
                       pathname === '/my-courses'
-                        ? 'bg-[#185FA5]/10 text-[#185FA5]'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-[#185FA5] dark:text-gray-300 dark:hover:bg-gray-800'
+                        ? 'bg-navy/10 text-navy'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
                     )}
                   >
                     <BookOpen className="h-4 w-4" />
@@ -276,8 +275,8 @@ export function Navbar() {
                     className={cn(
                       'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
                       pathname === '/profile'
-                        ? 'bg-[#185FA5]/10 text-[#185FA5]'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-[#185FA5] dark:text-gray-300 dark:hover:bg-gray-800'
+                        ? 'bg-navy/10 text-navy'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
                     )}
                   >
                     Profile
@@ -289,8 +288,8 @@ export function Navbar() {
                       className={cn(
                         'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
                         pathname === '/admin'
-                          ? 'bg-[#185FA5]/10 text-[#185FA5]'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-[#185FA5] dark:text-gray-300 dark:hover:bg-gray-800'
+                          ? 'bg-navy/10 text-navy'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
                       )}
                     >
                       Admin Panel
@@ -302,8 +301,8 @@ export function Navbar() {
                     className={cn(
                       'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
                       pathname === '/settings'
-                        ? 'bg-[#185FA5]/10 text-[#185FA5]'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-[#185FA5] dark:text-gray-300 dark:hover:bg-gray-800'
+                        ? 'bg-navy/10 text-navy'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
                     )}
                   >
                     Settings
@@ -324,15 +323,14 @@ export function Navbar() {
                   <Link
                     href="/login"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-[#185FA5] dark:text-gray-300 dark:hover:bg-gray-800"
+                    className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/signup"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-white transition-colors"
-                    style={{ backgroundColor: '#185FA5' }}
+                    className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-white transition-colors bg-saffron"
                   >
                     Get Started
                   </Link>
