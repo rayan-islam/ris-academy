@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@ris-academy/ui';
 import { useSession, signOut } from 'next-auth/react';
-import { Menu, Bell, LogOut } from 'lucide-react';
+import { Menu, Bell, LogOut, UserCircle } from 'lucide-react';
 import { getInitials } from '@/lib/utils';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -68,6 +68,12 @@ export function AdminNavbar() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
+                <Link href="/admin/profile">
+                  <UserCircle className="mr-2 h-4 w-4" />
+                  Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
                 <Link href="/">Back to Site</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -86,16 +92,17 @@ export function AdminNavbar() {
       {mobileOpen && (
         <div className="border-b bg-white dark:bg-gray-950 lg:hidden">
           <div className="space-y-1 px-4 py-3">
-            {[
-              { href: '/admin/dashboard', label: 'Dashboard' },
-              { href: '/admin/courses', label: 'Courses' },
-              { href: '/admin/exams', label: 'Exams' },
-              { href: '/admin/question-bank', label: 'Question Bank' },
-              { href: '/admin/students', label: 'Students' },
-              { href: '/admin/payments', label: 'Payments' },
-              { href: '/admin/materials', label: 'Materials' },
-              { href: '/admin/notifications', label: 'Notifications' },
-            ].map((link) => (
+              {[
+                { href: '/admin/dashboard', label: 'Dashboard' },
+                { href: '/admin/courses', label: 'Courses' },
+                { href: '/admin/exams', label: 'Exams' },
+                { href: '/admin/question-bank', label: 'Question Bank' },
+                { href: '/admin/students', label: 'Users' },
+                { href: '/admin/payments', label: 'Payments' },
+                { href: '/admin/materials', label: 'Materials' },
+                { href: '/admin/notifications', label: 'Notifications' },
+                { href: '/admin/profile', label: 'Profile' },
+              ].map((link) => (
               <Link
                 key={link.href}
                 href={link.href}

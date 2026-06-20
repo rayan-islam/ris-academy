@@ -1,6 +1,9 @@
 import { NextRequest } from 'next/server';
 import { db } from '@ris-academy/db';
 import { apiError, apiPaginated, requireAdmin, AuthError } from '@/lib/api-utils';
+import { Role } from '@prisma/client';
+
+const VALID_ROLES: Role[] = ['STUDENT', 'TEACHER', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN'];
 
 export async function GET(req: NextRequest) {
   try {
@@ -10,12 +13,15 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get('search');
     const hscYear = searchParams.get('hscYear');
     const isActiveParam = searchParams.get('isActive');
+    const roleParam = searchParams.get('role');
     const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
     const limit = Math.max(1, Math.min(50, parseInt(searchParams.get('limit') || '20', 10)));
 
-    const where: Record<string, unknown> = {
-      role: 'STUDENT',
-    };
+    const where: Record<string, unknown> = {};
+
+    if (roleParam && (VALID_ROLES as string[]).includes(roleParam)) {
+      where.role = roleParam;
+    }
 
     if (search) {
       where.OR = [
@@ -28,11 +34,11 @@ export async function GET(req: NextRequest) {
       where.hscYear = hscYear;
     }
 
-    if (isActiveParam !== null) {
+    if (isActiveParam !== null && isActiveParam !== undefined && isActiveParam !== '') {
       where.isActive = isActiveParam === 'true';
     }
 
-    const [students, total] = await Promise.all([
+    const [users, total] = await Promise.all([
       db.user.findMany({
         where: where as any,
         orderBy: { createdAt: 'desc' },
@@ -57,10 +63,10 @@ export async function GET(req: NextRequest) {
       db.user.count({ where: where as any }),
     ]);
 
-    return apiPaginated(students, total, page, limit);
+    return apiPaginated(users, total, page, limit);
   } catch (error) {
     if (error instanceof AuthError) return apiError(error.message, error.status);
-    console.error('Admin students list error:', error);
-    return apiError('Failed to fetch students', 500);
+    console.error('Admin users list error:', error);
+    return apiError('Failed to fetch users', 500);
   }
 }

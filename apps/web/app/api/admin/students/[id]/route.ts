@@ -1,6 +1,9 @@
 import { NextRequest } from 'next/server';
 import { db } from '@ris-academy/db';
 import { apiSuccess, apiError, requireAdmin, AuthError } from '@/lib/api-utils';
+import { Role } from '@prisma/client';
+
+const VALID_ROLES: Role[] = ['STUDENT', 'TEACHER', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN'];
 
 export async function GET(
   req: NextRequest,
@@ -46,13 +49,13 @@ export async function GET(
       },
     });
 
-    if (!user) return apiError('Student not found', 404);
+    if (!user) return apiError('User not found', 404);
 
     return apiSuccess(user);
   } catch (error) {
     if (error instanceof AuthError) return apiError(error.message, error.status);
-    console.error('Admin student detail error:', error);
-    return apiError('Failed to fetch student', 500);
+    console.error('Admin user detail error:', error);
+    return apiError('Failed to fetch user', 500);
   }
 }
 
@@ -61,13 +64,29 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   try {
-    await requireAdmin();
+    const admin = await requireAdmin();
 
     const body = await req.json();
     const { isActive, role } = body;
 
+    if (role !== undefined && !(VALID_ROLES as string[]).includes(role)) {
+      return apiError('Invalid role. Must be one of: ' + VALID_ROLES.join(', '), 422);
+    }
+
     const existing = await db.user.findUnique({ where: { id: params.id } });
-    if (!existing) return apiError('Student not found', 404);
+    if (!existing) return apiError('User not found', 404);
+
+    if (existing.role === 'SUPER_ADMIN' && admin.role !== 'SUPER_ADMIN') {
+      return apiError('Only a Super Admin can modify another Super Admin', 403);
+    }
+
+    if (role === 'SUPER_ADMIN' && admin.role !== 'SUPER_ADMIN') {
+      return apiError('Only a Super Admin can promote to Super Admin', 403);
+    }
+
+    if (role === 'ADMIN' && admin.role !== 'SUPER_ADMIN' && existing.id === admin.id) {
+      return apiError('Cannot change your own role', 403);
+    }
 
     const user = await db.user.update({
       where: { id: params.id },
@@ -94,7 +113,7 @@ export async function PATCH(
     return apiSuccess(user);
   } catch (error) {
     if (error instanceof AuthError) return apiError(error.message, error.status);
-    console.error('Admin update student error:', error);
-    return apiError('Failed to update student', 500);
+    console.error('Admin update user error:', error);
+    return apiError('Failed to update user', 500);
   }
 }

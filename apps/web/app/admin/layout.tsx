@@ -9,7 +9,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!session) redirect('/login');
 
   const role = (session.user as any)?.role;
-  if (role !== 'ADMIN' && role !== 'SUPER_ADMIN') redirect('/dashboard');
+  if (role !== 'ADMIN' && role !== 'SUPER_ADMIN' && role !== 'MODERATOR') redirect('/dashboard');
 
   return (
     <div className="min-h-screen bg-muted/30">

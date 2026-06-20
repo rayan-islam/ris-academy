@@ -14,6 +14,7 @@ import {
   FolderOpen,
   FileText,
   ChevronLeft,
+  UserCircle,
 } from 'lucide-react';
 import { Button } from '@ris-academy/ui';
 
@@ -41,7 +42,13 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: 'USERS',
     items: [
-      { href: '/admin/students', label: 'Students', icon: Users },
+      { href: '/admin/students', label: 'Users', icon: Users },
+    ],
+  },
+  {
+    title: 'ACCOUNT',
+    items: [
+      { href: '/admin/profile', label: 'Profile', icon: UserCircle },
     ],
   },
   {

@@ -42,6 +42,16 @@ export async function requireAdmin(): Promise<User> {
   return user;
 }
 
+export async function requireStaff(): Promise<User> {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) throw new AuthError('Unauthorized', 401);
+  const user = await db.user.findUnique({ where: { email: session.user.email! } });
+  if (!user || (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN' && user.role !== 'MODERATOR' && user.role !== 'TEACHER')) {
+    throw new AuthError('Forbidden', 403);
+  }
+  return user;
+}
+
 export async function requireAuth(): Promise<User> {
   const session = await getServerSession(authOptions);
   if (!session?.user) throw new AuthError('Unauthorized', 401);

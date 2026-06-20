@@ -1,12 +1,13 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle, Skeleton, Badge } from '@ris-academy/ui';
-import { Users, BookOpen, FileQuestion, Banknote, TrendingUp, ScrollText } from 'lucide-react';
+import { Users, BookOpen, FileQuestion, Banknote, TrendingUp, ScrollText, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { formatBDT, formatDate, cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 type AdminDashboardData = {
+  totalUsers: number;
   totalStudents: number;
   totalCourses: number;
   totalExams: number;
@@ -19,12 +20,13 @@ type AdminDashboardData = {
 };
 
 const statCards = [
-  { key: 'totalStudents', label: 'Total Students', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-950' },
-  { key: 'totalCourses', label: 'Total Courses', icon: BookOpen, color: 'text-green-600', bg: 'bg-green-50 dark:bg-green-950' },
-  { key: 'totalExams', label: 'Total Exams', icon: FileQuestion, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-950' },
-  { key: 'totalRevenue', label: 'Total Revenue (BDT)', icon: Banknote, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-950' },
+  { key: 'totalUsers', label: 'Total Users', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-950' },
+  { key: 'totalStudents', label: 'Students', icon: Shield, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-950' },
+  { key: 'totalCourses', label: 'Courses', icon: BookOpen, color: 'text-green-600', bg: 'bg-green-50 dark:bg-green-950' },
+  { key: 'totalExams', label: 'Exams', icon: FileQuestion, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-950' },
+  { key: 'totalRevenue', label: 'Revenue (BDT)', icon: Banknote, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-950' },
   { key: 'activeStudents', label: 'Active Students', icon: TrendingUp, color: 'text-rose-600', bg: 'bg-rose-50 dark:bg-rose-950' },
-  { key: 'totalCertificates', label: 'Certificates Issued', icon: ScrollText, color: 'text-cyan-600', bg: 'bg-cyan-50 dark:bg-cyan-950' },
+  { key: 'totalCertificates', label: 'Certificates', icon: ScrollText, color: 'text-cyan-600', bg: 'bg-cyan-50 dark:bg-cyan-950' },
 ] as const;
 
 export default function AdminDashboardPage() {
@@ -64,7 +66,7 @@ export default function AdminDashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
         {statCards.map(({ key, label, icon: Icon, color, bg }) => (
           <Card key={key}>
             <CardContent className="flex items-center gap-4 p-6">

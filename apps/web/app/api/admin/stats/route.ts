@@ -7,6 +7,7 @@ export async function GET(req: NextRequest) {
     await requireAdmin();
 
     const [
+      totalUsers,
       totalStudents,
       totalCourses,
       totalExams,
@@ -17,6 +18,7 @@ export async function GET(req: NextRequest) {
       paymentByMonth,
       totalCertificates,
     ] = await Promise.all([
+      db.user.count(),
       db.user.count({ where: { role: 'STUDENT' } }),
       db.course.count(),
       db.exam.count(),
@@ -67,6 +69,7 @@ export async function GET(req: NextRequest) {
       .sort((a, b) => a.month.localeCompare(b.month));
 
     return apiSuccess({
+      totalUsers,
       totalStudents,
       totalCourses,
       totalExams,
