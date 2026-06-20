@@ -359,7 +359,7 @@ export default function ExamTakePage() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-background">
+    <div className="fixed inset-0 z-50 flex flex-col bg-navy-dark text-parchment/90">
       {fullscreenDenied && (
         <div className="flex items-center justify-center gap-2 bg-yellow-100 dark:bg-yellow-950 px-4 py-3 text-sm font-medium text-yellow-800 dark:text-yellow-200">
           <AlertTriangle className="h-4 w-4" />
@@ -372,7 +372,7 @@ export default function ExamTakePage() {
 
       <div
         className={cn(
-          'flex items-center justify-between border-b px-6 py-3',
+          'flex items-center justify-between border-b border-parchment/10 px-6 py-3',
           isCritical && 'animate-pulse',
         )}
       >

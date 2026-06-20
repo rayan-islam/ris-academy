@@ -60,12 +60,12 @@ type DashboardResponse = {
 };
 
 const statConfig = [
-  { key: 'enrolledCourses', label: 'Enrolled Courses', icon: BookOpen, bg: 'bg-blue-50 dark:bg-blue-950', text: 'text-blue-600 dark:text-blue-400' },
-  { key: 'completedCourses', label: 'Completed Courses', icon: Award, bg: 'bg-green-50 dark:bg-green-950', text: 'text-green-600 dark:text-green-400' },
-  { key: 'upcomingExams', label: 'Upcoming Exams', icon: FileQuestion, bg: 'bg-amber-50 dark:bg-amber-950', text: 'text-amber-600 dark:text-amber-400' },
-  { key: 'averageScore', label: 'Avg. Score', icon: TrendingUp, bg: 'bg-purple-50 dark:bg-purple-950', text: 'text-purple-600 dark:text-purple-400', suffix: '%' },
-  { key: 'totalStudyTime', label: 'Study Time', icon: Clock, bg: 'bg-cyan-50 dark:bg-cyan-950', text: 'text-cyan-600 dark:text-cyan-400' },
-  { key: 'certificatesEarned', label: 'Certificates', icon: ScrollText, bg: 'bg-rose-50 dark:bg-rose-950', text: 'text-rose-600 dark:text-rose-400' },
+  { key: 'enrolledCourses', label: 'Enrolled Courses', icon: BookOpen },
+  { key: 'completedCourses', label: 'Completed', icon: Award },
+  { key: 'upcomingExams', label: 'Upcoming Exams', icon: FileQuestion },
+  { key: 'averageScore', label: 'Avg. Score', icon: TrendingUp, suffix: '%' },
+  { key: 'totalStudyTime', label: 'Study Time', icon: Clock },
+  { key: 'certificatesEarned', label: 'Certificates', icon: ScrollText },
 ] as const;
 
 const activityIcons: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -148,23 +148,19 @@ export default function DashboardPage() {
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
-        {statConfig.map(({ key, label, icon: Icon, bg, text }, i) => (
-          <Card key={key}>
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className={cn('flex h-12 w-12 items-center justify-center rounded-lg', bg, text)}>
-                {loading ? (
-                  <Skeleton className="h-12 w-12 rounded-lg" />
-                ) : (
-                  <Icon className="h-6 w-6" />
-                )}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {statConfig.map(({ key, label, icon: Icon }) => (
+          <Card key={key} className="border-stone-token bg-parchment shadow-sm">
+            <CardContent className="flex items-center gap-4 p-5">
+              <div className="hex-decoration flex h-12 w-12 items-center justify-center bg-navy/5">
+                <Icon className="h-5 w-5 text-navy" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">{label}</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-ink/40">{label}</p>
                 {loading ? (
                   <Skeleton className="mt-1 h-7 w-16" />
                 ) : (
-                  <p className="text-2xl font-bold">{statValues[key]}</p>
+                  <p className="font-mono text-2xl font-bold tabular-nums text-ink">{statValues[key]}</p>
                 )}
               </div>
             </CardContent>
