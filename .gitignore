@@ -56,3 +56,7 @@ apps/ai-service/chroma_db/
 
 # Uploads
 uploads/
+
+# Opencode agent skills (do not commit)
+.agents/
+skills-lock.json

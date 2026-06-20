@@ -46,31 +46,36 @@ export function Navbar() {
   const isLoggedIn = !!user;
   const unreadCount = 0;
 
+  const linkClass = (isActive: boolean) =>
+    cn(
+      'relative flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors',
+      isActive
+        ? 'text-saffron'
+        : 'text-parchment/70 hover:text-parchment'
+    );
+
+  const activeBar = (isActive: boolean) =>
+    isActive
+      ? 'absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-6 rounded-full bg-saffron'
+      : null;
+
   return (
-    <nav className="fixed inset-x-0 top-0 z-50 h-16 border-b bg-white dark:bg-gray-950">
+    <nav className="fixed inset-x-0 top-0 z-50 h-16 border-b border-navy-light bg-navy">
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2.5">
           <img src="/ris_academy_emblem.svg" alt="RI's Academy" className="h-8 w-auto" />
-          <span className="text-xl font-bold text-navy">RI&apos;s Academy</span>
+          <span className="text-xl font-bold text-parchment">RI&apos;s Academy</span>
         </Link>
 
-        <div className="hidden items-center gap-1 md:flex">
+        <div className="hidden items-center md:flex">
           {NAV_LINKS.map((link) => {
             const isActive =
               pathname === link.href || pathname.startsWith(`${link.href}/`);
             return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-navy/10 text-navy'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
-                )}
-              >
+              <Link key={link.href} href={link.href} className={linkClass(isActive)}>
                 <link.icon className="h-4 w-4" />
                 {link.label}
+                {activeBar(isActive)}
               </Link>
             );
           })}
@@ -81,7 +86,7 @@ export function Navbar() {
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="relative"
+            className="relative text-parchment/70 hover:text-parchment"
           >
             <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -89,7 +94,7 @@ export function Navbar() {
 
           {isLoggedIn ? (
             <>
-              <Button variant="ghost" size="icon" asChild className="relative">
+              <Button variant="ghost" size="icon" asChild className="relative text-parchment/70 hover:text-parchment">
                 <Link href="/notifications">
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
@@ -102,13 +107,13 @@ export function Navbar() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
+                  <Button variant="ghost" className="h-9 w-9 rounded-full p-0 ring-2 ring-saffron/30">
                     <Avatar className="h-9 w-9">
                       <AvatarImage
                         src={user?.image ?? ''}
                         alt={user?.name ?? ''}
                       />
-                      <AvatarFallback>
+                      <AvatarFallback className="bg-saffron/20 text-saffron">
                         {getInitials(user?.name)}
                       </AvatarFallback>
                     </Avatar>
@@ -161,13 +166,10 @@ export function Navbar() {
             </>
           ) : (
             <>
-              <Button variant="ghost" asChild>
+              <Button variant="ghost" asChild className="text-parchment/70 hover:text-parchment hover:bg-navy-light">
                 <Link href="/login">Sign In</Link>
               </Button>
-              <Button
-                asChild
-                className="bg-saffron text-white hover:bg-saffron/90"
-              >
+              <Button asChild className="bg-saffron text-white hover:bg-saffron/90">
                 <Link href="/signup">Get Started</Link>
               </Button>
             </>
@@ -179,16 +181,15 @@ export function Navbar() {
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="relative"
+            className="relative text-parchment/70 hover:text-parchment"
           >
-            <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <Sun className="h-5 w-5" />
           </Button>
-
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setMobileOpen((prev) => !prev)}
+            className="text-parchment"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
@@ -196,7 +197,7 @@ export function Navbar() {
       </div>
 
       {mobileOpen && (
-        <div className="border-b bg-white dark:bg-gray-950 md:hidden">
+        <div className="border-b border-navy-light bg-navy-dark md:hidden">
           <div className="space-y-1 px-4 py-3">
             {NAV_LINKS.map((link) => {
               const isActive =
@@ -210,8 +211,8 @@ export function Navbar() {
                   className={cn(
                     'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-navy/10 text-navy'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
+                      ? 'bg-saffron/10 text-saffron'
+                      : 'text-parchment/70 hover:bg-navy-light hover:text-parchment'
                   )}
                 >
                   <link.icon className="h-4 w-4" />
@@ -221,99 +222,40 @@ export function Navbar() {
             })}
           </div>
 
-          <div className="border-t px-4 py-3">
+          <div className="border-t border-navy-light px-4 py-3">
             <div className="space-y-1">
               {isLoggedIn ? (
                 <>
-                  <Link
-                    href="/notifications"
-                    onClick={() => setMobileOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
-                      pathname === '/notifications'
-                        ? 'bg-navy/10 text-navy'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
-                    )}
-                  >
-                    <Bell className="h-4 w-4" />
-                    Notifications
-                    {unreadCount > 0 && (
-                      <Badge className="ml-auto h-5 min-w-[20px] rounded-full px-1.5 text-[10px]">
-                        {unreadCount}
-                      </Badge>
-                    )}
-                  </Link>
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setMobileOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
-                      pathname === '/dashboard'
-                        ? 'bg-navy/10 text-navy'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
-                    )}
-                  >
-                    <LayoutDashboard className="h-4 w-4" />
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/my-courses"
-                    onClick={() => setMobileOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
-                      pathname === '/my-courses'
-                        ? 'bg-navy/10 text-navy'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
-                    )}
-                  >
-                    <BookOpen className="h-4 w-4" />
-                    My Courses
-                  </Link>
-                  <Link
-                    href="/profile"
-                    onClick={() => setMobileOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
-                      pathname === '/profile'
-                        ? 'bg-navy/10 text-navy'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
-                    )}
-                  >
-                    Profile
-                  </Link>
-                  {isAdmin && (
+                  {[
+                    { href: '/notifications', label: 'Notifications', icon: Bell },
+                    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+                    { href: '/my-courses', label: 'My Courses', icon: BookOpen },
+                    { href: '/profile', label: 'Profile', icon: null },
+                    ...(isAdmin ? [{ href: '/admin', label: 'Admin Panel', icon: null }] : []),
+                    { href: '/settings', label: 'Settings', icon: null },
+                  ].map((item) => (
                     <Link
-                      href="/admin"
+                      key={item.href}
+                      href={item.href}
                       onClick={() => setMobileOpen(false)}
                       className={cn(
                         'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
-                        pathname === '/admin'
-                          ? 'bg-navy/10 text-navy'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
+                        pathname === item.href
+                          ? 'bg-saffron/10 text-saffron'
+                          : 'text-parchment/70 hover:bg-navy-light hover:text-parchment'
                       )}
                     >
-                      Admin Panel
+                      {item.icon && <item.icon className="h-4 w-4" />}
+                      {item.label}
                     </Link>
-                  )}
-                  <Link
-                    href="/settings"
-                    onClick={() => setMobileOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
-                      pathname === '/settings'
-                        ? 'bg-navy/10 text-navy'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800'
-                    )}
-                  >
-                    Settings
-                  </Link>
+                  ))}
                   <button
                     type="button"
                     onClick={() => {
                       signOut({ callbackUrl: '/' });
                       setMobileOpen(false);
                     }}
-                    className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-950"
+                    className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10"
                   >
                     Sign Out
                   </button>
@@ -323,14 +265,14 @@ export function Navbar() {
                   <Link
                     href="/login"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-navy dark:text-gray-300 dark:hover:bg-gray-800"
+                    className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-parchment/70 transition-colors hover:bg-navy-light hover:text-parchment"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/signup"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-white transition-colors bg-saffron"
+                    className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-white transition-colors bg-saffron hover:bg-saffron/90"
                   >
                     Get Started
                   </Link>
